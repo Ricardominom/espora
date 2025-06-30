@@ -78,7 +78,7 @@ const WorkHubPage: React.FC = () => {
     setIsVisible(true);
 
     // Función para cargar las tareas
-    const loadTasks = () => {
+    const loadTasks = async () => {
       try {
         // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
         let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
