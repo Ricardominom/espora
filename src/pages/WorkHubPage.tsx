@@ -871,17 +871,6 @@ const WorkHubPage: React.FC = () => {
                     ) : (
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
-                          {!selectedAccount && (
-                            <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem' }}>
-                              <Briefcase size={48} style={{ marginBottom: '1.5rem', opacity: 0.7 }} />
-                              <h3 style={{ marginBottom: '1rem' }}>
-                                Selecciona una cuenta para ver los proyectos
-                              </h3>
-                              <p style={{ maxWidth: '300px', margin: '0 auto' }}>
-                                Haz clic en "Seleccionar cuenta" en la parte superior derecha para comenzar a trabajar con un proyecto.
-                              </p>
-                            </div>
-                          )}
                         </td>
                       </tr>
                     )}
