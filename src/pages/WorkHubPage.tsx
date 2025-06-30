@@ -930,9 +930,7 @@ const WorkHubPage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="empty-project-content">
-                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                              <h3>Selecciona una cuenta</h3>
-                              <p>Haz clic en "Seleccionar cuenta" para ver los proyectos</p>
+                             
                             </div>
                           )}
                         </td>
