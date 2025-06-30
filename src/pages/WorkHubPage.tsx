@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { getUserById } from '../data/users';
+import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
@@ -26,9 +26,8 @@ interface ProjectItem {
   id: string;
   concept: string;
   section: string;
-  sectionId: string; 
+  sectionId: string;
   completed?: boolean;
-  clientName?: string;
 }
 
 const WorkHubPage: React.FC = () => {
@@ -41,7 +40,7 @@ const WorkHubPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
     // Intentar cargar la cuenta seleccionada desde localStorage
     const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
-    return savedAccount || null;
+    return savedAccount;
   });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
@@ -107,31 +106,17 @@ const WorkHubPage: React.FC = () => {
     // Cargar tareas inicialmente
     loadTasks();
     loadProjectItems();
-  }, [user, selectedAccount]);
+  }, [user]);
 
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    // Filtrar los items del proyecto según la cuenta seleccionada
-    const filteredProjectItems = projectItems.filter(item => {
-      // Si no hay cuenta seleccionada, no mostrar nada
-      if (!selectedAccount) return false;
-      
-      // Si el item tiene clientName, verificar que coincida con la cuenta seleccionada
-      if (item.clientName) {
-        return item.clientName.includes(selectedAccount.name.split(' - ')[0]);
-      }
-      
-      // Si no tiene clientName, mostrar por defecto (comportamiento anterior)
-      return true;
-    });
-    
-    const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems]; 
+    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems]; 
     
     // Add task assignments that aren't already in project items
     taskAssignments.forEach(task => {
       // Check if this task is already in project items
-      const existingItem = filteredProjectItems.find(item => item.id === task.itemId);
+      const existingItem = projectItems.find(item => item.id === task.itemId);
       
       // If not found and it's a valid task with an itemId, add it
       if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
@@ -173,83 +158,37 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [projectItems, taskAssignments, selectedAccount]);
+  }, [projectItems, taskAssignments]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
-      setIsLoading(true);
+      // Cargar los ítems seleccionados y los datos del formulario
+      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      const formData = storage.getItem<{[key: string]: any[]}>('formData');
       
-      // Cargar todos los datos de acuerdos de colaboración
-      const allAgreementData = storage.getItem<{[clientName: string]: {
-        selectedItems: {[key: string]: boolean},
-        formData: {[key: string]: any[]}
-      }}>('allAgreementData') || {};
-      
-      // Cargar los datos del acuerdo actual
-      const agreementData = storage.getItem<{
-        selectedItems: {[key: string]: boolean},
-        formData: {[key: string]: any[]},
-        clientName: string
-      }>('agreementData');
-      
-      // Si hay datos de acuerdo actual, añadirlos a allAgreementData
-      if (agreementData && agreementData.clientName && agreementData.selectedItems && agreementData.formData) {
-        allAgreementData[agreementData.clientName] = {
-          selectedItems: agreementData.selectedItems,
-          formData: agreementData.formData
-        };
-      }
-      
-      // Cargar los datos antiguos para compatibilidad
-      const oldSelectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
-      const oldFormData = storage.getItem<{[key: string]: any[]}>('formData');
-      const oldClientName = storage.getItem<string>('clientName');
-      
-      // Si hay datos antiguos y no están en allAgreementData, añadirlos
-      if (oldClientName && oldSelectedItems && oldFormData) {
-        if (!allAgreementData[oldClientName]) {
-          allAgreementData[oldClientName] = {
-            selectedItems: oldSelectedItems,
-            formData: oldFormData
-          };
-        }
-      }
-      
-      // Guardar todos los datos de acuerdos
-      storage.setItem('allAgreementData', allAgreementData);
-      
-      // Crear una lista de todos los items de todos los clientes
-      const allItems: ProjectItem[] = [];
-      
-      // Procesar cada cliente y sus datos
-      Object.entries(allAgreementData).forEach(([clientName, data]) => {
-        const { selectedItems, formData } = data;
+      if (formData) {
+        const items: ProjectItem[] = [];
         
-        if (formData) {
-          // Procesar cada sección
-          Object.entries(formData).forEach(([sectionId, sectionData]: [string, any[]]) => {
-            sectionData.forEach((item) => {
-              // Solo incluir items reales (que comiencen con A- o B-)
-              if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-                allItems.push({
-                  id: item.id,
-                  concept: item.concept,
-                  section: getSectionName(sectionId),
-                  sectionId: sectionId,
-                  clientName: clientName // Guardar el nombre del cliente para filtrar después
-                });
-              }
-            });
+        // Procesar cada sección
+        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+          data.forEach((item) => {
+            // Solo incluir items reales (que comiencen con A- o B-)
+            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+              items.push({
+                id: item.id,
+                concept: item.concept,
+                section: getSectionName(sectionId),
+                sectionId: sectionId
+              });
+            }
           });
-        }
-      });
-      
-      setProjectItems(allItems);
-      setIsLoading(false);
+        });
+        
+        setProjectItems(items);
+      }
     } catch (error) {
       console.error('Error loading project items:', error);
-      setIsLoading(false);
     }
   };
 
@@ -452,17 +391,17 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
-
+    
     // Guardar la cuenta seleccionada en localStorage
-    storage.saveSelectedWorkHubAccount({ id: accountId, name: accountName });
-
+    storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
+    
     setIsLoading(true);
-
-    // Recargar los datos del proyecto con la nueva cuenta seleccionada
+    
+    // Simular carga de datos
     setTimeout(() => {
-      loadProjectItems();
+      // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
       setIsLoading(false);
-    }, 800);
+    }, 1500);
   };
 
   return (
@@ -641,20 +580,7 @@ const WorkHubPage: React.FC = () => {
                     {selectedAccount && Object.keys(groupedItems).length > 0 ? (
                       sectionOrder.map(sectionName => {
                         const items = groupedItems[sectionName] || [];
-                        // Filtrar items por cuenta seleccionada
-                        const filteredItems = items.filter(item => {
-                          if (!selectedAccount) return false;
-                          
-                          // Si el item tiene clientName, verificar que coincida con la cuenta seleccionada
-                          if ('clientName' in item && item.clientName) {
-                            return item.clientName.includes(selectedAccount.name.split(' - ')[0]);
-                          }
-                          
-                          // Si no tiene clientName, mostrar por defecto (comportamiento anterior)
-                          return true;
-                        });
-                        
-                        if (filteredItems.length === 0) return null;
+                        if (items.length === 0) return null;
                         
                         return (
                           <React.Fragment key={sectionName}>
@@ -663,7 +589,7 @@ const WorkHubPage: React.FC = () => {
                                 {sectionName}
                               </td>
                             </tr>
-                            {filteredItems.map((item) => (
+                            {items.map((item) => (
                               <tr key={item.id} className={item.completed ? "completed-item" : ""}>
                                 <td className="item-code-cell">
                                   <div className="item-code">{item.id}</div>

@@ -295,22 +295,12 @@ const AccountPage: React.FC = () => {
         
         // Guardar el estado actual de los datos del formulario
         storage.setItem('formData', formData);
-        
-        // Guardar los datos del acuerdo con el nombre del cliente
-        if (clientName) {
-          storage.saveAgreementData(clientName, checkedItems, formData);
-        }
       } else {
         // Last tab completed, go to checklist
         setCompletedTabs(newCompletedTabs);
         
         // Guardar el estado actual de los datos del formulario
         storage.setItem('formData', formData);
-        
-        // Guardar los datos del acuerdo con el nombre del cliente
-        if (clientName) {
-          storage.saveAgreementData(clientName, checkedItems, formData);
-        }
         
         navigate('/checklist-captura', { 
           state: { 
