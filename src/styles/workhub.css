@@ -838,6 +838,61 @@
   color: #4a5568;
 }
 
+/* Item status cell */
+.item-status-cell {
+  text-align: center;
+}
+
+.status-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme completed status */
+.workhub-page.dark-theme .status-completed {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgba(34, 197, 94, 0.9);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Light theme completed status */
+.workhub-page.light-theme .status-completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme pending status */
+.workhub-page.dark-theme .status-pending {
+  background: rgba(234, 179, 8, 0.2);
+  color: rgba(234, 179, 8, 0.9);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+/* Light theme pending status */
+.workhub-page.light-theme .status-pending {
+  background: rgba(234, 179, 8, 0.1);
+  color: #ca8a04;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
 /* Completed item row */
 .workhub-page .completed-item {
   position: relative;
@@ -845,12 +900,12 @@
 
 /* Dark theme completed item */
 .workhub-page.dark-theme .completed-item {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(34, 197, 94, 0.08);
 }
 
 /* Light theme completed item */
 .workhub-page.light-theme .completed-item {
-  background: rgba(34, 197, 94, 0.05);
+  background: rgba(34, 197, 94, 0.04);
 }
 
 .project-table-container::-webkit-scrollbar {

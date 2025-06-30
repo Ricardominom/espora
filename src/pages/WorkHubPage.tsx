@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase } from 'lucide-react';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, CheckCheck } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
@@ -36,7 +36,8 @@ const WorkHubPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tareas' | 'proyecto'>('tareas');
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
-  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
+  const [combinedItems, setCombinedItems] = useState<(ProjectItem | TaskAssignment)[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
     // Intentar cargar los valores de los campos desde localStorage
     const savedValues = storage.getItem<{[key: string]: string}>('fieldValues');
@@ -96,6 +97,32 @@ const WorkHubPage: React.FC = () => {
     loadTasks();
     loadProjectItems();
   }, [user]);
+
+  // Combine project items and task assignments for the project tab
+  useEffect(() => {
+    // Create a combined list of project items and task assignments
+    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
+    
+    // Add task assignments that aren't already in project items
+    taskAssignments.forEach(task => {
+      // Check if this task is already in project items
+      const existingItem = projectItems.find(item => item.id === task.itemId);
+      
+      // If not found and it's a valid task with an itemId, add it
+      if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
+        combined.push({
+          id: task.itemId,
+          concept: task.concept || "Tarea sin nombre",
+          section: task.section || "Sin sección",
+          sectionId: task.sectionId || "",
+          completed: task.completed || false,
+          isTaskAssignment: true
+        });
+      }
+    });
+    
+    setCombinedItems(combined);
+  }, [projectItems, taskAssignments]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
@@ -420,10 +447,9 @@ const WorkHubPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th>Updates</th>
-                    <th>Subele...</th>
                     <th>Código</th>
                     <th>Sección</th>
+                    <th>Estado</th>
                     <th>Fase</th>
                     <th>Línea estratégica</th>
                     <th>Microcampaña</th>
@@ -450,27 +476,29 @@ const WorkHubPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {projectItems.length > 0 ? (
-                    projectItems.map((item) => (
-                      <tr key={item.id}>
-                        <td>
-                          <button className="project-action-btn update-btn">
-                            <FileText size={14} />
-                          </button>
-                        </td>
-                        <td>
-                          <button className="project-action-btn upload-btn">
-                            <ArrowUp size={14} />
-                          </button>
+                  {combinedItems.length > 0 ? (
+                    combinedItems.map((item) => (
+                      <tr key={item.id} className={item.completed ? "completed-item" : ""}>
+                        <td className="item-code-cell">
+                          {item.id} - {item.concept}
                         </td>
                         <td className="item-code-cell">
                           {item.id}
                         </td>
-                        <td className="item-concept-cell">
-                          {`${item.id} - ${item.concept}`}
-                        </td>
                         <td className="item-section-cell">
                           {item.section}
+                        </td>
+                        <td className="item-status-cell">
+                          {item.completed ? (
+                            <div className="status-completed">
+                              <CheckCheck size={14} />
+                              <span>Completado</span>
+                            </div>
+                          ) : (
+                            <div className="status-pending">
+                              <span>Pendiente</span>
+                            </div>
+                          )}
                         </td>
                         <td>
                           <input 
@@ -716,7 +744,7 @@ const WorkHubPage: React.FC = () => {
                     ))
                   ) : (
                     <tr style={{ height: '300px' }}>
-                      <td colSpan={28} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                      <td colSpan={27} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                         <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
                           <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                           <h3>No hay ítems de proyecto</h3>
