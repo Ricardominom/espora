@@ -894,9 +894,7 @@ const WorkHubPage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="empty-project-content">
-                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                              <h3>{!selectedAccount ? 'Selecciona una cuenta' : 'No hay ítems para esta cuenta'}</h3>
-                              <p>{!selectedAccount ? 'Haz clic en "Seleccionar cuenta" para ver los proyectos' : 'Esta cuenta no tiene ítems en el acuerdo de colaboración'}</p>
+                              
                             </div>
                           )}
                         </td>
