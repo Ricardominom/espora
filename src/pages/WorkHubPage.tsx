@@ -422,7 +422,7 @@ const WorkHubPage: React.FC = () => {
                     <th>Updates</th>
                     <th>Subele...</th>
                     <th>Código</th>
-                    <th>Concepto</th>
+                    <th>Item</th>
                     <th>Sección</th>
                     <th>Fase</th>
                     <th>Línea estratégica</th>
@@ -467,7 +467,7 @@ const WorkHubPage: React.FC = () => {
                           {item.id}
                         </td>
                         <td className="item-concept-cell">
-                          {item.concept}
+                          {`${item.id} - ${item.concept}`}
                         </td>
                         <td className="item-section-cell">
                           {item.section}
