@@ -77,30 +77,29 @@ const WorkHubPage: React.FC = () => {
   useEffect(() => {
     setIsVisible(true);
 
-    console.log("WorkHubPage mounted");
     // Función para cargar las tareas
     const loadTasks = () => {
       try {
         // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
         let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
         
-        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-) 
+        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+        console.log("Raw task assignments:", savedAssignments.length);
+        
         savedAssignments = savedAssignments.filter(task => 
-          task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+          task && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
         );
         
         console.log("All task assignments:", savedAssignments.length);
-        
-        // Para tareas, mostrar todas las tareas de todas las cuentas
-        savedAssignments = savedAssignments.filter(task => 
-          task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
-        );
         
         // Filtrar solo las tareas asignadas al usuario actual
         if (user) {
           const userTasks = savedAssignments.filter(task => task.userId === user.id);
           console.log("User tasks:", userTasks.length);
           setTaskAssignments(userTasks);
+        } else {
+          console.log("No user found");
+          setTaskAssignments([]);
         }
       } catch (error) {
         console.error('Error loading task assignments:', error);
@@ -109,6 +108,12 @@ const WorkHubPage: React.FC = () => {
     
     // Cargar tareas inicialmente
     loadTasks();
+    
+    // Configurar un intervalo para verificar periódicamente si hay nuevas tareas
+    const intervalId = setInterval(loadTasks, 3000);
+    
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(intervalId);
   }, [user]);
 
   // Combine project items and task assignments for the project tab
@@ -116,12 +121,16 @@ const WorkHubPage: React.FC = () => {
     // Create a combined list of project items and task assignments
     let combined: (ProjectItem | TaskAssignment)[] = [];
     
+    console.log(`Processing items for ${activeTab} tab`);
+    
     if (activeTab === 'proyecto') {
       // For proyecto tab, we only show project items from the selected account
       combined = [...projectItems];
+      console.log("Project items:", projectItems.length);
     } else {
       // For tareas tab, we show task assignments
       combined = [...taskAssignments];
+      console.log("Task assignments:", taskAssignments.length);
     }
     
     console.log(`Combined items for ${activeTab} tab:`, combined.length);
@@ -129,9 +138,24 @@ const WorkHubPage: React.FC = () => {
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
     
-    combined.forEach(item => {
-      const sectionId = item.sectionId || 'unknown';
-      const sectionName = getSectionNameFromId(sectionId);
+    combined.forEach((item, index) => {
+      if (!item) {
+        console.log(`Skipping undefined item at index ${index}`);
+        return;
+      }
+      
+      let sectionName: string;
+      
+      if ('section' in item && item.section) {
+        // If the item already has a section name, use it
+        sectionName = item.section;
+      } else if ('sectionId' in item && item.sectionId) {
+        // Otherwise, get the section name from the ID
+        sectionName = getSectionNameFromId(item.sectionId);
+      } else {
+        // Default section for items without section info
+        sectionName = 'Sin categoría';
+      }
       
       if (!grouped[sectionName]) {
         grouped[sectionName] = [];
@@ -142,6 +166,7 @@ const WorkHubPage: React.FC = () => {
     
     // Define the order of sections
     const order = [
+      'Sin categoría',
       'Set Up Estrategia Digital',
       'Estudios Antropológicos',
       'Otros Estudios',
@@ -153,7 +178,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-    console.log("Grouped items:", Object.keys(grouped).length, "sections");
+    console.log("Grouped items by section:", Object.keys(grouped));
   }, [projectItems, taskAssignments, activeTab]);
   
   // Effect to handle tab changes
@@ -186,6 +211,7 @@ const WorkHubPage: React.FC = () => {
       // Cargar los ítems seleccionados y los datos del formulario
       let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData');
+      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
       
       if (formData) {
         const items: ProjectItem[] = [];
@@ -198,9 +224,9 @@ const WorkHubPage: React.FC = () => {
               items.push({
                 id: item.id,
                 concept: item.concept,
-                section: getSectionName(sectionId),
+                section: getSectionNameFromId(sectionId),
                 sectionId: sectionId,
-                completed: false // Default value
+                completed: completedItems[item.id] || false
               });
             }
           });
@@ -227,13 +253,13 @@ const WorkHubPage: React.FC = () => {
   // Función para obtener el nombre de la sección
   const getSectionName = (sectionId: string): string => {
     const sectionMapping: {[key: string]: string} = {
-      'estrategia': 'Set Up Estrategia Digital',
-      'antropologicos': 'Estudios Antropológicos', 
+      estrategia: 'Set Up Estrategia Digital',
+      antropologicos: 'Estudios Antropológicos', 
       'otros-estudios': 'Otros Estudios',
-      'acompanamiento': 'Set Up Acompañamiento Digital',
-      'gerencia': 'Set Up Gerencia Digital',
-      'produccion': 'Set Up Producción',
-      'difusion': 'Set up Difusión'
+      acompanamiento: 'Set Up Acompañamiento Digital',
+      gerencia: 'Set Up Gerencia Digital',
+      produccion: 'Set Up Producción',
+      difusion: 'Set up Difusión'
     };
     
     return sectionMapping[sectionId] || sectionId;
@@ -242,13 +268,13 @@ const WorkHubPage: React.FC = () => {
   // Función para obtener el nombre de la sección a partir del sectionId
   const getSectionNameFromId = (sectionId: string): string => {
     const sectionMapping = {
-      'estrategia': 'Set Up Estrategia Digital',
-      'antropologicos': 'Estudios Antropológicos', 
+      estrategia: 'Set Up Estrategia Digital',
+      antropologicos: 'Estudios Antropológicos', 
       'otros-estudios': 'Otros Estudios',
-      'acompanamiento': 'Set Up Acompañamiento Digital',
-      'gerencia': 'Set Up Gerencia Digital',
-      'produccion': 'Set Up Producción',
-      'difusion': 'Set up Difusión'
+      acompanamiento: 'Set Up Acompañamiento Digital',
+      gerencia: 'Set Up Gerencia Digital',
+      produccion: 'Set Up Producción',
+      difusion: 'Set up Difusión'
     };
     return sectionMapping[sectionId as keyof typeof sectionMapping] || sectionId;
   };
@@ -259,7 +285,7 @@ const WorkHubPage: React.FC = () => {
     
     // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
     const realTasks = taskAssignments.filter(task => 
-      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+      task && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
     
     if (!realTasks.length) return [];
@@ -314,7 +340,7 @@ const WorkHubPage: React.FC = () => {
     
     // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
     const realTasks = taskAssignments.filter(task => 
-      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+      task && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
     
     if (!realTasks.length) return 0;
@@ -335,7 +361,9 @@ const WorkHubPage: React.FC = () => {
     nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
     
     return taskAssignments.filter(task => {
-      if (!task.dueDate || !task.itemId || !(task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) return false;
+      if (!task || !task.itemId || !(task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
+        return false;
+      }
       
       const dueDate = new Date(task.dueDate);
       dueDate.setHours(0, 0, 0, 0);
@@ -603,6 +631,8 @@ const WorkHubPage: React.FC = () => {
                         const items = groupedItems[sectionName] || [];
                         if (items.length === 0) return null;
                         
+                        console.log(`Rendering section ${sectionName} with ${items.length} items`);
+                        
                         return (
                           <React.Fragment key={sectionName}>
                             <tr className="section-header">
@@ -611,7 +641,7 @@ const WorkHubPage: React.FC = () => {
                               </td>
                             </tr>
                             {items.map((item) => (
-                              <tr key={item.id} className={item.completed ? "completed-item" : ""}>
+                              <tr key={item.id || `item-${Math.random()}`} className={item.completed ? "completed-item" : ""}>
                                 <td className="item-code-cell">
                                   <div className="item-code">{item.id}</div>
                                   <div className="item-concept-cell">{item.concept}</div>
@@ -625,6 +655,19 @@ const WorkHubPage: React.FC = () => {
                                   <button className="project-action-btn upload-btn">
                                     <ArrowUp size={16} />
                                   </button>
+                                </td>
+                                <td className="item-status-cell">
+                                  {item.completed ? (
+                                    <div className="status-completed">
+                                      <CheckCircle size={14} />
+                                      <span>Completada</span>
+                                    </div>
+                                  ) : (
+                                    <div className="status-pending">
+                                      <Clock size={14} />
+                                      <span>Pendiente</span>
+                                    </div>
+                                  )}
                                 </td>
                                 <td>
                                   <input 
