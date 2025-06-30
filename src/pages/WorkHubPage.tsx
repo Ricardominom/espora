@@ -411,7 +411,7 @@ const WorkHubPage: React.FC = () => {
         </div>
         
         <h1 className="workhub-title">
-          WORKHUB {selectedAccount && `- ${selectedAccount.name}`}
+          WORKHUB
         </h1>
         
         <div className="header-right">
