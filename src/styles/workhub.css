@@ -857,6 +857,51 @@
   color: #4a5568;
 }
 
+/* Section badge */
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Dark theme section badge */
+.workhub-page.dark-theme .section-badge {
+  background: rgba(147, 112, 219, 0.15);
+  color: rgba(147, 112, 219, 0.9);
+  border: 1px solid rgba(147, 112, 219, 0.25);
+}
+
+/* Light theme section badge */
+.workhub-page.light-theme .section-badge {
+  background: rgba(1, 113, 226, 0.08);
+  color: #0171E2;
+  border: 1px solid rgba(1, 113, 226, 0.15);
+}
+
+.section-icon {
+  flex-shrink: 0;
+}
+
+/* Dark theme section icon */
+.workhub-page.dark-theme .section-icon {
+  color: rgba(147, 112, 219, 1);
+}
+
+/* Light theme section icon */
+.workhub-page.light-theme .section-icon {
+  color: #0171E2;
+}
+
 /* Item status cell */
 .item-status-cell {
   text-align: center;

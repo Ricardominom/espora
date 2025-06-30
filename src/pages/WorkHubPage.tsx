@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, CheckCheck } from 'lucide-react';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Tag } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
@@ -36,7 +36,7 @@ const WorkHubPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tareas' | 'proyecto'>('tareas');
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
-  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
   const [combinedItems, setCombinedItems] = useState<(ProjectItem | TaskAssignment)[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
     // Intentar cargar los valores de los campos desde localStorage
@@ -335,6 +335,22 @@ const WorkHubPage: React.FC = () => {
     const fieldKey = `${itemId}-${fieldName}`;
     return fieldValues[fieldKey] || '';
   };
+  
+  {/* Mapeo de secciones con sus títulos correctos */}
+  const sectionMapping = {
+    'estrategia': 'Set Up Estrategia Digital',
+    'antropologicos': 'Estudios Antropológicos', 
+    'otros-estudios': 'Otros Estudios',
+    'acompanamiento': 'Set Up Acompañamiento Digital',
+    'gerencia': 'Set Up Gerencia Digital',
+    'produccion': 'Set Up Producción',
+    'difusion': 'Set up Difusión'
+  };
+  
+  // Función para obtener el nombre de la sección a partir del sectionId
+  const getSectionNameFromId = (sectionId: string): string => {
+    return sectionMapping[sectionId as keyof typeof sectionMapping] || sectionId;
+  };
 
   return (
     <div className={`workhub-page ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
@@ -447,6 +463,7 @@ const WorkHubPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Item</th>
+                    <th>Configuración</th>
                     <th>Updates</th>
                     <th>Subele...</th>
                     <th>Fase</th>
@@ -481,6 +498,12 @@ const WorkHubPage: React.FC = () => {
                         <td className="item-code-cell">
                           <div className="item-code">{item.id}</div>
                           <div className="item-concept-cell">{item.concept}</div>
+                        </td>
+                        <td className="item-section-cell">
+                          <div className="section-badge">
+                            <Tag size={12} className="section-icon" />
+                            <span>{getSectionNameFromId(item.sectionId)}</span>
+                          </div>
                         </td>
                         <td>
                           <button className="project-action-btn update-btn">
@@ -736,7 +759,7 @@ const WorkHubPage: React.FC = () => {
                     ))
                   ) : (
                     <tr style={{ height: '300px' }}>
-                      <td colSpan={25} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                      <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                         <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
                           <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                           <h3>No hay ítems de proyecto</h3>
