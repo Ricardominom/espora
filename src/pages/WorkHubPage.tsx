@@ -8,7 +8,7 @@ import { LogoutDialog } from '../components/LogoutDialog';
 import { SelectAccountModalForWorkHub } from '../components/SelectAccountModalForWorkHub';
 import FileNameEditModal from '../components/FileNameEditModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { 
   FolderOpen, 
