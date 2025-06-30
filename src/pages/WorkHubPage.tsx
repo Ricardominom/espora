@@ -222,15 +222,16 @@ const WorkHubPage: React.FC = () => {
       let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData');
       
+      const loadedItems: ProjectItem[] = [];
+      
       if (formData && Object.keys(formData).length > 0) {
-        const items: ProjectItem[] = [];
         
         // Procesar cada sección
         Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
           data.forEach((item) => {
             // Solo incluir items reales (que comiencen con A- o B-)
             if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-              items.push({
+              loadedItems.push({
                 id: item.id,
                 concept: item.concept,
                 section: getSectionName(sectionId),
@@ -240,12 +241,9 @@ const WorkHubPage: React.FC = () => {
             }
           });
         });
-        
-        setProjectItems(items);
       }
       
-      // Also update filtered items if an account is selected
-      if (selectedAccount) setFilteredProjectItems(items);
+      setProjectItems(loadedItems);
       
       // Load completed items status
       const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
@@ -279,7 +277,7 @@ const WorkHubPage: React.FC = () => {
     if (!taskAssignments.length) return [];
     
     // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-    const realTasks = taskAssignments.filter(task => 
+    let realTasks = taskAssignments.filter(task => 
       task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
     
@@ -342,7 +340,7 @@ const WorkHubPage: React.FC = () => {
     if (!taskAssignments.length) return 0;
     
     // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-    const realTasks = taskAssignments.filter(task => 
+    let realTasks = taskAssignments.filter(task => 
       task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
     
