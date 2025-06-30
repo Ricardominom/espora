@@ -632,7 +632,6 @@ const WorkHubPage: React.FC = () => {
                               <tr key={item.id} className={item.completed ? "completed-item" : ""}>
                                 <td className="item-code-cell">
                                   <div className="item-code">{item.id}</div>
-                                  <div className="item-concept-cell">{item.concept}</div>
                                 </td>
                                 <td>
                                   <button className="project-action-btn upload-btn">
