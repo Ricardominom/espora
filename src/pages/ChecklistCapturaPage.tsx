@@ -418,6 +418,7 @@ const ChecklistCapturaPage: React.FC = () => {
            concept: item.concept,
            section: item.section,
            sectionId: item.sectionId,
+            clientName: clientName, // Agregar referencia al cliente
             completed: item.completed
           };
           setTaskAssignments(updatedAssignments);
@@ -431,6 +432,7 @@ const ChecklistCapturaPage: React.FC = () => {
             section: item.section,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',
+            clientName: clientName, // Agregar referencia al cliente
             completed: item.completed
           };
           

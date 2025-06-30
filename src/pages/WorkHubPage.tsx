@@ -18,6 +18,7 @@ interface TaskAssignment {
   section: string;
   sectionId?: string;
   completed?: boolean;
+  clientName?: string; // Agregar referencia al cliente
   code?: string;
 }
 
@@ -81,30 +82,8 @@ const WorkHubPage: React.FC = () => {
   
   useEffect(() => {
     setIsVisible(true);
-
-    // Función para cargar las tareas
-    const loadTasks = () => {
-      try {
-        // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
-        let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
-        
-        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-        savedAssignments = savedAssignments.filter(task => 
-          task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
-        );
-        
-        // Filtrar solo las tareas asignadas al usuario actual
-        if (user) {
-          const userTasks = savedAssignments.filter(task => task.userId === user.id);
-          setTaskAssignments(userTasks);
-        }
-      } catch (error) {
-        console.error('Error loading task assignments:', error);
-      }
-    };
     
-    // Cargar tareas inicialmente
-    loadTasks();
+    // Cargar tareas y proyectos
     loadProjectItems();
   }, [user]);
 
@@ -117,6 +96,12 @@ const WorkHubPage: React.FC = () => {
 
     // Get client name from selected account
     const clientName = selectedAccount.name.split(' - ')[0];
+    
+    // Filter task assignments based on the selected client
+    const filteredTasks = taskAssignments.filter(task => 
+      task.clientName === clientName
+    );
+    setTaskAssignments(filteredTasks);
 
     // Load client-specific data from localStorage
     const clientData = storage.getItem<{
@@ -191,43 +176,11 @@ const WorkHubPage: React.FC = () => {
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
-      // Cargar los ítems seleccionados y los datos del formulario
-      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
-      const formData = storage.getItem<{[key: string]: any[]}>('formData');
-      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
-      if (formData) {
-        const items: ProjectItem[] = [];
-        
-        // Procesar cada sección
-        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
-          data.forEach((item) => {
-            // Solo incluir items reales (que comiencen con A- o B-)
-            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-              items.push({
-                id: item.id,
-                concept: item.concept,
-                section: getSectionName(sectionId),
-                sectionId: sectionId,
-                completed: completedItems[item.id] || false
-              });
-            }
-          });
-        });
-        
-        setProjectItems(items);
-      }
-      
-      // Store data for each client separately
-      // This allows us to filter by client later
-      const clientsData = storage.getItem<string[]>('clientsList') || [];
-      
-      clientsData.forEach(clientName => {
-        storage.setItem(`client_${clientName}_data`, {
-          selectedItems,
-          formData,
-          completedItems
-        });
-      });
+      // Ahora solo cargamos las tareas asignadas al usuario actual
+      // Los datos específicos del proyecto se cargarán cuando se seleccione una cuenta
+      const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+      const userAssignments = savedAssignments.filter(task => task.userId === user?.id);
+      setTaskAssignments(userAssignments);
     } catch (error) {
       console.error('Error loading project items:', error);
     }
@@ -252,12 +205,14 @@ const WorkHubPage: React.FC = () => {
   const getFilteredTasks = () => {
     if (!taskAssignments.length) return [];
     
-    // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-    const realTasks = taskAssignments.filter(task => 
-      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+    // Filtrar solo tareas reales y que pertenezcan al usuario actual
+    const userTasks = taskAssignments.filter(task => 
+      task.itemId && 
+      (task.itemId.startsWith('A-') || task.itemId.startsWith('B-')) &&
+      task.userId === user?.id
     );
     
-    if (!realTasks.length) return [];
+    if (!userTasks.length) return [];
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -272,7 +227,7 @@ const WorkHubPage: React.FC = () => {
     nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
     
     return taskAssignments.filter(task => {
-      // Si la categoría es "all", mostrar todas las tareas reales
+      // Si la categoría es "all", mostrar todas las tareas del usuario
       if (selectedCategory === 'all') return true;
       
       if (!task.dueDate) return selectedCategory === 'no-date'; 
@@ -309,15 +264,17 @@ const WorkHubPage: React.FC = () => {
   const getTaskCountForCategory = (categoryId: string) => {
     if (!taskAssignments.length) return 0;
     
-    // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-    const realTasks = taskAssignments.filter(task => 
-      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+    // Filtrar solo tareas del usuario actual
+    const userTasks = taskAssignments.filter(task => 
+      task.itemId && 
+      (task.itemId.startsWith('A-') || task.itemId.startsWith('B-')) &&
+      task.userId === user?.id
     );
     
-    if (!realTasks.length) return 0;
+    if (!userTasks.length) return 0;
 
     // Si la categoría es "all", mostrar el total de tareas
-    if (categoryId === 'all') return realTasks.length;
+    if (categoryId === 'all') return userTasks.length;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -436,12 +393,19 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
-    
+
     // Guardar la cuenta seleccionada en localStorage
     storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
 
     // Extract client name from account name
     const clientName = accountName.split(' - ')[0];
+    
+    // Filter task assignments to show only those for this client
+    const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+    const clientTasks = savedAssignments.filter(task => 
+      task.clientName === clientName && task.userId === user?.id
+    );
+    setTaskAssignments(clientTasks);
     
     // Add to clients list if not already there
     const clientsList = storage.getItem<string[]>('clientsList') || [];
@@ -919,7 +883,7 @@ const WorkHubPage: React.FC = () => {
                         <td colSpan={26} className="empty-project-message">
                           {!selectedAccount ? (
                             null
-                          ) : null}
+                          ) : <div className="empty-project-content"><p>No hay datos para esta cuenta</p></div>}
                         </td>
                       </tr>
                     )}
