@@ -477,9 +477,8 @@ const ChecklistCapturaPage: React.FC = () => {
             ...updatedAssignments[existingAssignmentIndex],
             userId: userId,
             concept: item.concept,
+            section: item.section,
             sectionId: item.sectionId,
-           section: item.section,
-           sectionId: item.sectionId,
             completed: item.completed
           };
           setTaskAssignments(updatedAssignments);
