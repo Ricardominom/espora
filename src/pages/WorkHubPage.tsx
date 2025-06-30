@@ -632,7 +632,7 @@ const WorkHubPage: React.FC = () => {
                     {selectedAccount && Object.keys(groupedItems).length > 0 ? (
                       sectionOrder.map(sectionName => {
                         const items = groupedItems[sectionName] || [];
-                        if (items.length === 0) return null;
+                        if (items.length === 0) return null; // Skip empty sections
                         
                         return (
                           <React.Fragment key={sectionName}>
@@ -911,12 +911,14 @@ const WorkHubPage: React.FC = () => {
                       })
                     ) : (
                       <tr style={{ height: '300px' }}>
-                        <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
-                          <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
-                            <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                            <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta'}</h3>
-                            <p>{selectedAccount ? 'Esta cuenta no tiene ítems en el acuerdo de colaboración' : 'Haz clic en "Seleccionar cuenta" para ver los proyectos'}</p>
-                          </div> 
+                        <td colSpan={26} className="empty-project-message">
+                          {!selectedAccount ? (
+                            <div className="empty-project-content">
+                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                              <h3>Selecciona una cuenta</h3>
+                              <p>Haz clic en "Seleccionar cuenta" para ver los proyectos</p>
+                            </div>
+                          ) : null}
                         </td>
                       </tr>
                     )}
