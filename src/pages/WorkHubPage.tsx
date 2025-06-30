@@ -429,15 +429,11 @@ const WorkHubPage: React.FC = () => {
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
     
-    // Reset field values when changing accounts
-    setFieldValues({});
-    
     // Guardar la cuenta seleccionada en localStorage
     storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
     
     // Reset filtered items and grouped items
     setFilteredProjectItems([]);
-    setGroupedItems({});
     
     setIsLoading(true);
     
@@ -639,15 +635,6 @@ const WorkHubPage: React.FC = () => {
                                   <div className="item-concept-cell">{item.concept}</div>
                                 </td>
                                 <td>
-                                  <div className="item-status-cell">
-                                    {item.completed ? (
-                                      <span className="status-completed"><CheckCircle size={14} /> Completado</span>
-                                    ) : (
-                                      <span className="status-pending"><Clock4 size={14} /> Pendiente</span>
-                                    )}
-                                  </div>
-                                </td>
-                                <td>
                                   <button className="project-action-btn upload-btn">
                                     <ArrowUp size={16} />
                                   </button>
@@ -655,7 +642,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-fase`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'fase')}
                                     placeholder="Fase" 
@@ -666,7 +652,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-linea_estrategica`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'linea_estrategica')}
                                     placeholder="Línea estratégica" 
@@ -677,7 +662,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-microcampana`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'microcampana')}
                                     placeholder="Microcampaña" 
@@ -688,7 +672,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-estatus`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'estatus')}
                                     placeholder="Estatus" 
@@ -699,7 +682,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-gerente`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'gerente')}
                                     placeholder="Gerente" 
@@ -710,7 +692,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-colaboradores`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'colaboradores')}
                                     placeholder="Colaboradores" 
@@ -721,7 +702,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-nombre_colaborador`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'nombre_colaborador')}
                                     placeholder="Nombre del colaborador" 
@@ -732,7 +712,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-perfil_colaborador`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'perfil_colaborador')}
                                     placeholder="Perfil de colaborador" 
@@ -743,7 +722,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-solicitud_entrega`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'solicitud_entrega')}
                                     placeholder="Solicitud y entrega" 
@@ -754,7 +732,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-semana_curso`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'semana_curso')}
                                     placeholder="Semana en curso" 
@@ -765,7 +742,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-tipo_item`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'tipo_item')}
                                     placeholder="Tipo de item" 
@@ -776,7 +752,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-cantidad_v`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'cantidad_v')}
                                     placeholder="Cantidad V..." 
@@ -787,7 +762,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-cantidad_pr`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'cantidad_pr')}
                                     placeholder="Cantidad Pr..." 
@@ -798,7 +772,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-cantidad_a`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'cantidad_a')}
                                     placeholder="Cantidad A..." 
@@ -809,7 +782,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="date" 
-                                    key={`${item.id}-${selectedAccount?.id}-fecha_finalizacion`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'fecha_finalizacion')}
                                     onChange={(e) => {
@@ -825,7 +797,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-repositorio_co`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'repositorio_co')}
                                     placeholder="Repositorio de co..." 
@@ -836,7 +807,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-repositorio_firma`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'repositorio_firma')}
                                     placeholder="Repositorio firma..." 
@@ -847,7 +817,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-enlace_repositorio`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'enlace_repositorio')}
                                     placeholder="Enlace de repositorio" 
@@ -858,7 +827,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-desarrollo_creativo`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'desarrollo_creativo')}
                                     placeholder="Desarrollo creativo" 
@@ -869,7 +837,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="date" 
-                                    key={`${item.id}-${selectedAccount?.id}-fecha_testeo`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'fecha_testeo')}
                                     onChange={(e) => {
@@ -885,7 +852,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-estatus_testeo`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'estatus_testeo')}
                                     placeholder="Estatus testeo" 
@@ -896,7 +862,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-entrega_cliente`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'entrega_cliente')}
                                     placeholder="Entrega al cliente" 
@@ -907,7 +872,6 @@ const WorkHubPage: React.FC = () => {
                                 <td>
                                   <input 
                                     type="text" 
-                                    key={`${item.id}-${selectedAccount?.id}-nombre_archivo`}
                                     className="project-input" 
                                     value={getFieldValue(item.id, 'nombre_archivo')}
                                     placeholder="Nombre del archivo" 
@@ -930,7 +894,7 @@ const WorkHubPage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="empty-project-content">
-                             
+                              
                             </div>
                           )}
                         </td>

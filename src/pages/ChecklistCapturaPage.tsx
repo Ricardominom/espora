@@ -7,7 +7,6 @@ import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import { useAuthStore } from '../stores/authStore';
 import AccessDeniedModal from '../components/AccessDeniedModal';
 import InputModal from '../components/InputModal';
-import LoadingSpinner from '../components/LoadingSpinner';
 import LogoutDialog from '../components/LogoutDialog';
 import { storage } from '../utils/storage';
 import '../styles/checklist-captura.css';
@@ -37,7 +36,6 @@ const ChecklistCapturaPage: React.FC = () => {
   const [clientName, setClientName] = useState('');
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [users, setUsers] = useState<Omit<User, 'password'>[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showAccessDeniedModal, setShowAccessDeniedModal] = useState(false);
@@ -147,44 +145,24 @@ const ChecklistCapturaPage: React.FC = () => {
   useEffect(() => {
     const state = location.state as any;
     if (state && state.clientName) {
-      // If client name changed, reset all data
-      if (clientName !== state.clientName) {
-        setIsLoading(true);
-        // Clear previous data
-        setChecklistItems([]);
-        setTaskAssignments([]);
-        setFieldValues({});
-        setDueDates({});
-        
-        // Reset localStorage for this specific component
-        storage.removeItem('fieldValues');
-        storage.removeItem('dueDates');
-        storage.removeItem('taskAssignments');
-        storage.removeItem('completedItems');
-      }
-      
       setClientName(state.clientName);
     }
     
     // Si no hay datos en el state, intentar cargar desde localStorage
     if (!state || !state.selectedItems || !state.allData) {
-      setIsLoading(true);
       const savedItems = storage.getItem<{[key: string]: boolean}>('selectedItems');
       const savedFormData = storage.getItem<{[key: string]: any}>('formData');
       
       if (savedItems && savedFormData) {
         generateChecklistItems(savedItems, savedFormData);
-        setIsLoading(false);
       }
     } else {
       generateChecklistItems(state.selectedItems, state.allData);
-      setIsLoading(false);
     }
   }, [location]);
 
   // Función para generar los items del checklist
   const generateChecklistItems = (selectedItems: {[key: string]: boolean}, allData: {[key: string]: any[]}) => {
-    setIsLoading(true);
     const items: ChecklistItem[] = [];
 
     // Process each section type
@@ -219,12 +197,10 @@ const ChecklistCapturaPage: React.FC = () => {
     });
 
     setChecklistItems(items);
-    setIsLoading(false);
   };
 
   useEffect(() => {
     setIsVisible(true); 
-    setIsLoading(true);
     
     // Cargar el estado de completado de los items desde localStorage
     const savedCompletedItems = storage.getItem<{[key: string]: boolean}>('completedItems');
@@ -236,8 +212,6 @@ const ChecklistCapturaPage: React.FC = () => {
         }))
       );
     }
-    
-    setIsLoading(false);
   }, []);
 
   const toggleItemCompletion = (itemId: string) => {
@@ -637,11 +611,6 @@ const ChecklistCapturaPage: React.FC = () => {
       />
 
       <div className={`checklist-content ${isVisible ? 'visible' : ''}`}>
-        {isLoading ? (
-          <div className="loading-container">
-            <LoadingSpinner size="lg" text="Cargando datos..." />
-          </div>
-        ) : (
         <div className="checklist-table-container">
           {/* Barra de scroll horizontal superior */}
           <div 
@@ -740,8 +709,7 @@ const ChecklistCapturaPage: React.FC = () => {
                         <td>
                           <select
                             className="table-input"
-                            key={`${item.id}-${clientName}-select`}
-                            value={getFieldValue(item.id, 'assignedUser')}
+                            value={getFieldValue(item.id, 'assignedUser') || ''}
                             onChange={(e) => handleUserAssignment(item.id, e.target.value)}
                             disabled={!currentUser || !hasPermission(currentUser, 'assign_tasks')} 
                           >
@@ -766,7 +734,6 @@ const ChecklistCapturaPage: React.FC = () => {
                         <td>
                           <input 
                             type="date" 
-                            key={`${item.id}-${clientName}-date`}
                             className="table-input" 
                             value={dueDates[item.id] || ''}
                             onChange={(e) => handleDueDateChange(item.id, e.target.value)}
@@ -1012,7 +979,6 @@ const ChecklistCapturaPage: React.FC = () => {
             </table>
           </div>
         </div>
-        )}
       </div>
 
       <InputModal
