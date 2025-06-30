@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
@@ -45,7 +44,8 @@ const WorkHubPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
-  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
+  const [filteredProjectItems, setFilteredProjectItems] = useState<ProjectItem[]>([]);
   const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
   const [sectionOrder, setSectionOrder] = useState<string[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
@@ -108,15 +108,62 @@ const WorkHubPage: React.FC = () => {
     loadProjectItems();
   }, [user]);
 
+  // Effect to filter project items based on selected account
+  useEffect(() => {
+    if (activeTab === 'proyecto' && selectedAccount) {
+      // In a real app, we would fetch project items for the selected account from the server
+      // For now, we'll simulate this by filtering the items based on the selected account
+      
+      // Get client name from the selected account
+      const clientName = selectedAccount.name.split(' - ')[0];
+      
+      // Get all items from localStorage
+      const selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      const formData = storage.getItem<{[key: string]: any[]}>('formData');
+      const clientNameFromStorage = storage.getItem<string>('clientName');
+      
+      // If the selected account matches the client in localStorage, show the items
+      // Otherwise, show no items (empty array)
+      if (formData && clientNameFromStorage && clientNameFromStorage.includes(clientName)) {
+        const items: ProjectItem[] = [];
+        
+        // Process each section
+        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+          data.forEach((item) => {
+            // Only include items that are selected and have valid IDs
+            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+              items.push({
+                id: item.id,
+                concept: item.concept,
+                section: getSectionName(sectionId),
+                sectionId: sectionId
+              });
+            }
+          });
+        });
+        
+        setFilteredProjectItems(items);
+      } else {
+        // If the selected account doesn't match, show no items
+        setFilteredProjectItems([]);
+      }
+      
+      setIsLoading(false);
+    }
+  }, [selectedAccount, activeTab]);
+
   // Combine project items and task assignments for the project tab
   useEffect(() => {
+    // Use filtered project items when an account is selected, otherwise use all project items
+    const itemsToUse = selectedAccount ? filteredProjectItems : projectItems;
+    
     // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems]; 
+    const combined: (ProjectItem | TaskAssignment)[] = [...itemsToUse]; 
     
     // Add task assignments that aren't already in project items
     taskAssignments.forEach(task => {
       // Check if this task is already in project items
-      const existingItem = projectItems.find(item => item.id === task.itemId);
+      const existingItem = itemsToUse.find(item => item.id === task.itemId);
       
       // If not found and it's a valid task with an itemId, add it
       if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
@@ -158,7 +205,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [projectItems, taskAssignments]);
+  }, [projectItems, filteredProjectItems, taskAssignments, selectedAccount]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
@@ -395,12 +442,14 @@ const WorkHubPage: React.FC = () => {
     // Guardar la cuenta seleccionada en localStorage
     storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
     
+    // Reset filtered project items
+    setFilteredProjectItems([]);
     setIsLoading(true);
     
     // Simular carga de datos
     setTimeout(() => {
-      // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
-      setIsLoading(false);
+      // This will trigger the useEffect that filters project items
+      setIsLoading(false); 
     }, 1500);
   };
 
