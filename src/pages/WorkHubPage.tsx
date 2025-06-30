@@ -549,7 +549,6 @@ const WorkHubPage: React.FC = () => {
                   <thead>
                     <tr>
                       <th>Item</th>
-                      <th>Estado</th>
                       <th>Subele...</th>
                       <th>Fase</th>
                       <th>Línea estratégica</th>
