@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, User, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Activity, Users, UserCheck } from 'lucide-react';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
@@ -35,7 +35,7 @@ const WorkHubPage: React.FC = () => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'tareas' | 'proyecto'>('tareas');
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('today');
   const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
     // Intentar cargar los valores de los campos desde localStorage
@@ -74,8 +74,13 @@ const WorkHubPage: React.FC = () => {
     // Función para cargar las tareas
     const loadTasks = () => {
       try {
-        // Cargar las asignaciones de tareas desde localStorage 
-        const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+        // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
+        let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+        
+        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+        savedAssignments = savedAssignments.filter(task => 
+          task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+        );
         
         // Filtrar solo las tareas asignadas al usuario actual
         if (user) {
@@ -90,19 +95,13 @@ const WorkHubPage: React.FC = () => {
     // Cargar tareas inicialmente
     loadTasks();
     loadProjectItems();
-    
-    // Configurar un intervalo para verificar periódicamente si hay nuevas tareas
-    const intervalId = setInterval(loadTasks, 3000);
-    
-    // Limpiar el intervalo cuando el componente se desmonte
-    return () => clearInterval(intervalId);
   }, [user]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
       // Cargar los ítems seleccionados y los datos del formulario
-      const selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData');
       
       if (formData) {
@@ -111,7 +110,8 @@ const WorkHubPage: React.FC = () => {
         // Procesar cada sección
         Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
           data.forEach((item) => {
-            if (selectedItems[item.id]) {
+            // Solo incluir items reales (que comiencen con A- o B-)
+            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
               items.push({
                 id: item.id,
                 concept: item.concept,
@@ -148,6 +148,13 @@ const WorkHubPage: React.FC = () => {
   const getFilteredTasks = () => {
     if (!taskAssignments.length) return [];
     
+    // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+    const realTasks = taskAssignments.filter(task => 
+      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+    );
+    
+    if (!realTasks.length) return [];
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -161,7 +168,7 @@ const WorkHubPage: React.FC = () => {
     nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
     
     return taskAssignments.filter(task => {
-      // Si la categoría es "all", mostrar todas las tareas
+      // Si la categoría es "all", mostrar todas las tareas reales
       if (selectedCategory === 'all') return true;
       
       if (!task.dueDate) return selectedCategory === 'no-date'; 
@@ -195,9 +202,16 @@ const WorkHubPage: React.FC = () => {
   // Función para obtener el conteo de tareas por categoría
   const getTaskCountForCategory = (categoryId: string) => {
     if (!taskAssignments.length) return 0;
+    
+    // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+    const realTasks = taskAssignments.filter(task => 
+      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+    );
+    
+    if (!realTasks.length) return 0;
 
     // Si la categoría es "all", mostrar el total de tareas
-    if (categoryId === 'all') return taskAssignments.length;
+    if (categoryId === 'all') return realTasks.length;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -212,7 +226,7 @@ const WorkHubPage: React.FC = () => {
     nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
     
     return taskAssignments.filter(task => {
-      if (!task.dueDate) return categoryId === 'no-date';
+      if (!task.dueDate || !task.itemId || !(task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) return false;
       
       const dueDate = new Date(task.dueDate);
       dueDate.setHours(0, 0, 0, 0);
@@ -366,7 +380,7 @@ const WorkHubPage: React.FC = () => {
                 filteredTasks.map((task) => (
                   <div key={task.itemId} className="task-card">
                     <div className="task-card-header">
-                      <div className="task-card-section">{task.section}</div>
+                      <div className="task-card-section">{task.section || "Sin sección"}</div>
                       <div className="task-card-date">
                         <Calendar size={14} />
                         <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString('es-ES', { 
@@ -377,7 +391,7 @@ const WorkHubPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="task-card-content">
-                      <h3 className="task-card-title">{task.concept || "Tarea sin nombre"}</h3>
+                      <h3 className="task-card-title">{task.concept || task.itemId || "Tarea sin nombre"}</h3>
                       <div className="task-card-footer">
                         <div className="task-card-code">{task.itemId || task.code}</div>
                         {task.completed && (
@@ -407,6 +421,9 @@ const WorkHubPage: React.FC = () => {
                   <tr>
                     <th>Updates</th>
                     <th>Subele...</th>
+                    <th>Código</th>
+                    <th>Concepto</th>
+                    <th>Sección</th>
                     <th>Fase</th>
                     <th>Línea estratégica</th>
                     <th>Microcampaña</th>
@@ -438,13 +455,22 @@ const WorkHubPage: React.FC = () => {
                       <tr key={item.id}>
                         <td>
                           <button className="project-action-btn update-btn">
-                            <FileText size={16} />
+                            <FileText size={14} />
                           </button>
                         </td>
                         <td>
                           <button className="project-action-btn upload-btn">
-                            <ArrowUp size={16} />
+                            <ArrowUp size={14} />
                           </button>
+                        </td>
+                        <td className="item-code-cell">
+                          {item.id}
+                        </td>
+                        <td className="item-concept-cell">
+                          {item.concept}
+                        </td>
+                        <td className="item-section-cell">
+                          {item.section}
                         </td>
                         <td>
                           <input 
@@ -690,9 +716,9 @@ const WorkHubPage: React.FC = () => {
                     ))
                   ) : (
                     <tr style={{ height: '300px' }}>
-                      <td colSpan={25} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                      <td colSpan={28} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                         <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
-                          <Briefcase size={48} />
+                          <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                           <h3>No hay ítems de proyecto</h3>
                           <p>Aún no se han agregado ítems al acuerdo de colaboración</p>
                         </div>
