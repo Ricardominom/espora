@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Users, CheckCircle } from 'lucide-react';
 import '../styles/modal.css';
 
+
 interface Account {
   id: number;
   name: string;
@@ -23,8 +24,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   currentAccountId
 }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedAccountId, setSelectedAccountId] = useState<string>(currentAccountId?.toString() || "");
-
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   useEffect(() => {
     // Fetch active accounts
     const fetchAccounts = () => {
@@ -81,7 +81,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+        <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group" style={{ gridColumn: 'span 2' }}>
             <label htmlFor="accountSelect">Selecciona una cuenta</label>
             <select
@@ -103,7 +103,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
                 </option>
               ))}
             </select>
-          </div>
+          </div> 
 
           <div className="modal-footer">
             <button type="button" onClick={onClose} className="cancel-button">

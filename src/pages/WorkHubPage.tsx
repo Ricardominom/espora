@@ -548,8 +548,7 @@ const WorkHubPage: React.FC = () => {
                 <table className="project-table">
                   <thead>
                     <tr>
-                      <th>Item</th>
-                      <th>Estado</th>
+                      <th>Item</th> 
                       <th>Subele...</th>
                       <th>Fase</th>
                       <th>Línea estratégica</th>
@@ -582,18 +581,6 @@ const WorkHubPage: React.FC = () => {
                         const items = groupedItems[sectionName] || [];
                         if (items.length === 0) return null;
                         
-                        return (
-                          <React.Fragment key={sectionName}>
-                            <tr className="section-header">
-                              <td colSpan={26} className="section-title">
-                                {sectionName}
-                              </td>
-                            </tr>
-                            {items.map((item) => (
-                              <tr key={item.id} className={item.completed ? "completed-item" : ""}>
-                                <td className="item-code-cell">
-                                  <div className="item-code">{item.id}</div>
-                                  <div className="item-concept-cell">{item.concept}</div>
                                 </td>
                                 <td>
                                   <button className="project-action-btn upload-btn">
@@ -847,14 +834,12 @@ const WorkHubPage: React.FC = () => {
                       })
                     ) : (
                       <tr style={{ height: '300px' }}>
-                        <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                        <td colSpan={25} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                           <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
                             <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                             <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta'}</h3>
                             <p>{selectedAccount ? 'Esta cuenta no tiene ítems en el acuerdo de colaboración' : 'Haz clic en "Seleccionar cuenta" para ver los proyectos'}</p>
                           </div> 
-                        </td>
-                      </tr>
                     )}
                   </tbody>
                 </table>
