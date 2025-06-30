@@ -9,7 +9,7 @@ import { SelectAccountModalForWorkHub } from '../components/SelectAccountModalFo
 import { FileNameEditModal } from '../components/FileNameEditModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorMessage } from '../components/ErrorMessage';
+import ErrorMessage from '../components/ErrorMessage';
 import { 
   FolderOpen, 
   FileText, 
