@@ -1468,7 +1468,7 @@
 /* Logout Button */
 .logout-button {
   position: fixed;
-  bottom: 2rem;
+  bottom: 5rem;
   right: 2rem;
   display: flex;
   align-items: center;
@@ -1486,7 +1486,7 @@
 /* Dark theme logout button */
 .workhub-page.dark-theme .logout-button {
   background: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.2); 
   color: rgba(255, 255, 255, 0.7);
 }
 
