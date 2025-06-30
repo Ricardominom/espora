@@ -451,6 +451,7 @@ const ChecklistCapturaPage: React.FC = () => {
   // Función para manejar el cambio de fecha de vencimiento
   const handleDueDateChange = (itemId: string, date: string) => {
     // Actualizar el estado de fechas
+    // Ensure the date is stored without timezone adjustments
     const updatedDates = { ...dueDates, [itemId]: date };
     setDueDates(updatedDates);
     
@@ -458,7 +459,7 @@ const ChecklistCapturaPage: React.FC = () => {
     const assignmentIndex = taskAssignments.findIndex(a => a.itemId === itemId);
     if (assignmentIndex >= 0) {
       const updatedAssignments = [...taskAssignments]; 
-      updatedAssignments[assignmentIndex].dueDate = date;
+      updatedAssignments[assignmentIndex].dueDate = date; // Store the exact date string
       setTaskAssignments(updatedAssignments);
       
       // Guardar en localStorage
@@ -734,7 +735,7 @@ const ChecklistCapturaPage: React.FC = () => {
                         <td>
                           <input 
                             type="date" 
-                            className="table-input" 
+                            className="table-input"
                             value={dueDates[item.id] || ''}
                             onChange={(e) => handleDueDateChange(item.id, e.target.value)}
                             min={new Date().toISOString().split('T')[0]}
