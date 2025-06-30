@@ -19,6 +19,7 @@ const LogoutDialog: React.FC<LogoutDialogProps> = ({ isOpen, onClose, onConfirm 
   const handleConfirmLogout = () => {
     // Limpiar datos del localStorage al cerrar sesión
     storage.clearAgreementData();
+    storage.removeItem('selectedWorkHubAccount');
     logout();
     
     // Si hay una función onConfirm personalizada, ejecutarla después del logout

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
@@ -39,7 +39,7 @@ const WorkHubPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
     // Intentar cargar la cuenta seleccionada desde localStorage
     const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
-    return savedAccount;
+    return null; // Reset to null on page load to force user selection
   });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
@@ -111,7 +111,9 @@ const WorkHubPage: React.FC = () => {
   // Effect to filter project items based on selected account
   useEffect(() => {
     if (!selectedAccount) {
+      // Clear filtered items when no account is selected
       setFilteredProjectItems([]);
+      setGroupedItems({});
       return;
     }
 
@@ -126,6 +128,7 @@ const WorkHubPage: React.FC = () => {
     }>(`client_${clientName}_data`);
 
     if (clientData) {
+      setIsLoading(true);
       // Use client-specific data if available
       const items: ProjectItem[] = [];
       
@@ -146,11 +149,14 @@ const WorkHubPage: React.FC = () => {
       }
       
       setFilteredProjectItems(items);
+      setIsLoading(false);
     } else {
       // Filter project items based on the selected account
       // This is a fallback if client-specific data isn't available
       // In a real app, you would fetch data for the specific account from the server
       setFilteredProjectItems([]);
+      setGroupedItems({});
+      setIsLoading(false);
     }
   }, [selectedAccount]);
 
@@ -158,6 +164,11 @@ const WorkHubPage: React.FC = () => {
   useEffect(() => {
     // Create a combined list of filtered project items and task assignments
     const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems];
+    
+    if (combined.length === 0) {
+      setGroupedItems({});
+      return;
+    }
 
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
@@ -189,6 +200,7 @@ const WorkHubPage: React.FC = () => {
   }, [filteredProjectItems]);
 
   // Función para cargar los ítems del proyecto desde localStorage
+  // This function is only used for initial loading
   const loadProjectItems = () => {
     try {
       // Cargar los ítems seleccionados y los datos del formulario
@@ -216,6 +228,7 @@ const WorkHubPage: React.FC = () => {
         
         setProjectItems(items);
       }
+      setIsLoading(false);
       
       // Store data for each client separately
       // This allows us to filter by client later
@@ -230,6 +243,7 @@ const WorkHubPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Error loading project items:', error);
+      setIsLoading(false);
     }
   };
 
@@ -433,6 +447,12 @@ const WorkHubPage: React.FC = () => {
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
     
+    // Clear previous data
+    setFilteredProjectItems([]);
+    setGroupedItems({});
+    
+    setIsLoading(true);
+    
     // Guardar la cuenta seleccionada en localStorage
     storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
 
@@ -445,12 +465,6 @@ const WorkHubPage: React.FC = () => {
       clientsList.push(clientName);
       storage.setItem('clientsList', clientsList);
     }
-    
-    
-    setIsLoading(true);
-    
-    // Simular carga de datos
-    setTimeout(() => {
       // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
       setIsLoading(false);
     }, 800);
@@ -911,7 +925,7 @@ const WorkHubPage: React.FC = () => {
                       })
                     ) : (
                       <tr style={{ height: '300px' }}>
-                        <td colSpan={26} className="empty-project-message">
+                        <td colSpan={26} style={{ height: '300px' }}>
                           {!selectedAccount ? (
                             <div className="empty-project-content">
                               <Briefcase size={48} style={{ marginBottom: '1rem' }} />
@@ -983,6 +997,7 @@ const WorkHubPage: React.FC = () => {
       <LogoutDialog
         isOpen={showLogoutDialog}
         onClose={() => setShowLogoutDialog(false)}
+        onConfirm={() => setSelectedAccount(null)}
       />
     </div>
   );
