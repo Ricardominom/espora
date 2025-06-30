@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useFileStore } from '../stores/fileStore';
 import { useClientStore } from '../stores/clientStore';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 import { LogoutDialog } from '../components/LogoutDialog';
 import { SelectAccountModalForWorkHub } from '../components/SelectAccountModalForWorkHub';
 import FileNameEditModal from '../components/FileNameEditModal';
