@@ -164,9 +164,6 @@ const ChecklistCapturaPage: React.FC = () => {
   // Función para generar los items del checklist
   const generateChecklistItems = (selectedItems: {[key: string]: boolean}, allData: {[key: string]: any[]}) => {
     const items: ChecklistItem[] = [];
-    
-    // Ensure we have the client name
-    const clientNameToUse = clientName || storage.getItem<string>('clientName') || 'Cliente';
 
     // Process each section type
     Object.entries(allData).forEach(([sectionId, data]: [string, any[]]) => {
@@ -419,10 +416,8 @@ const ChecklistCapturaPage: React.FC = () => {
             ...updatedAssignments[existingAssignmentIndex],
             userId: userId,
            concept: item.concept,
-          clientName: clientNameToUse, // Add client name to the assignment
            section: item.section,
            sectionId: item.sectionId,
-            clientName: clientName, // Agregar referencia al cliente
             completed: item.completed
           };
           setTaskAssignments(updatedAssignments);
@@ -433,11 +428,9 @@ const ChecklistCapturaPage: React.FC = () => {
             itemId, 
             userId, 
             concept: item.concept, 
-            clientName: clientNameToUse, // Add client name to the assignment
             section: item.section,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',
-            clientName: clientName, // Agregar referencia al cliente
             completed: item.completed
           };
           
@@ -458,7 +451,6 @@ const ChecklistCapturaPage: React.FC = () => {
   // Función para manejar el cambio de fecha de vencimiento
   const handleDueDateChange = (itemId: string, date: string) => {
     // Actualizar el estado de fechas
-    // Ensure the date is stored without timezone adjustments
     const updatedDates = { ...dueDates, [itemId]: date };
     setDueDates(updatedDates);
     
@@ -466,7 +458,7 @@ const ChecklistCapturaPage: React.FC = () => {
     const assignmentIndex = taskAssignments.findIndex(a => a.itemId === itemId);
     if (assignmentIndex >= 0) {
       const updatedAssignments = [...taskAssignments]; 
-      updatedAssignments[assignmentIndex].dueDate = date; // Store the exact date string
+      updatedAssignments[assignmentIndex].dueDate = date;
       setTaskAssignments(updatedAssignments);
       
       // Guardar en localStorage
@@ -742,7 +734,7 @@ const ChecklistCapturaPage: React.FC = () => {
                         <td>
                           <input 
                             type="date" 
-                            className="table-input"
+                            className="table-input" 
                             value={dueDates[item.id] || ''}
                             onChange={(e) => handleDueDateChange(item.id, e.target.value)}
                             min={new Date().toISOString().split('T')[0]}
