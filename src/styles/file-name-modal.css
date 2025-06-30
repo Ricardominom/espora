@@ -1,0 +1,562 @@
+/* File Name Edit Modal Styles */
+.file-name-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: modalFadeIn 0.2s ease-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme modal overlay */
+.file-name-modal-overlay.dark-theme {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Light theme modal overlay */
+.file-name-modal-overlay.light-theme {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.file-name-modal-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 1rem;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme modal container */
+.file-name-modal-overlay.dark-theme .file-name-modal-container {
+  background: linear-gradient(135deg, 
+    rgba(26, 11, 46, 0.95) 0%, 
+    rgba(88, 51, 139, 0.9) 50%, 
+    rgba(26, 11, 46, 0.95) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.3);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 8px 32px rgba(88, 51, 139, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme modal container */
+.file-name-modal-overlay.light-theme .file-name-modal-container {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.98) 0%, 
+    rgba(248, 250, 252, 0.95) 50%, 
+    rgba(255, 255, 255, 0.98) 100%
+  );
+  border: 1px solid rgba(1, 113, 226, 0.2);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 8px 32px rgba(1, 113, 226, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.file-name-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem 1rem 2rem;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme modal header */
+.file-name-modal-overlay.dark-theme .file-name-modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme modal header */
+.file-name-modal-overlay.light-theme .file-name-modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-title-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme modal title */
+.file-name-modal-overlay.dark-theme .modal-title-section h3 {
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Light theme modal title */
+.file-name-modal-overlay.light-theme .modal-title-section h3 {
+  color: #1a202c;
+  text-shadow: none;
+}
+
+.modal-title-icon {
+  transition: color 0.3s ease;
+}
+
+/* Dark theme modal title icon */
+.file-name-modal-overlay.dark-theme .modal-title-icon {
+  color: rgba(147, 112, 219, 0.9);
+  filter: drop-shadow(0 0 4px rgba(147, 112, 219, 0.4));
+}
+
+/* Light theme modal title icon */
+.file-name-modal-overlay.light-theme .modal-title-icon {
+  color: #0171E2;
+  filter: drop-shadow(0 0 4px rgba(1, 113, 226, 0.2));
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark theme close button */
+.file-name-modal-overlay.dark-theme .modal-close-button {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.file-name-modal-overlay.dark-theme .modal-close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 12px rgba(147, 112, 219, 0.3);
+}
+
+/* Light theme close button */
+.file-name-modal-overlay.light-theme .modal-close-button {
+  color: #718096;
+}
+
+.file-name-modal-overlay.light-theme .modal-close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a202c;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 12px rgba(1, 113, 226, 0.2);
+}
+
+.file-name-modal-content {
+  padding: 0 2rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme file preview */
+.file-name-modal-overlay.dark-theme .file-preview {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme file preview */
+.file-name-modal-overlay.light-theme .file-preview {
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.file-preview-icon {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme preview icon */
+.file-name-modal-overlay.dark-theme .file-preview-icon {
+  background: rgba(147, 112, 219, 0.2);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+/* Light theme preview icon */
+.file-name-modal-overlay.light-theme .file-preview-icon {
+  background: rgba(1, 113, 226, 0.1);
+  border: 1px solid rgba(1, 113, 226, 0.2);
+}
+
+.file-preview-info {
+  flex: 1;
+}
+
+.current-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme current name */
+.file-name-modal-overlay.dark-theme .current-name {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme current name */
+.file-name-modal-overlay.light-theme .current-name {
+  color: #718096;
+}
+
+.current-name-display {
+  font-size: 1rem;
+  font-weight: 600;
+  word-break: break-all;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme current name display */
+.file-name-modal-overlay.dark-theme .current-name-display {
+  color: white;
+}
+
+/* Light theme current name display */
+.file-name-modal-overlay.light-theme .current-name-display {
+  color: #1a202c;
+}
+
+.file-name-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme input label */
+.file-name-modal-overlay.dark-theme .input-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Light theme input label */
+.file-name-modal-overlay.light-theme .input-label {
+  color: #2d3748;
+}
+
+.file-name-input-container {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme input container */
+.file-name-modal-overlay.dark-theme .file-name-input-container {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 0 rgba(147, 112, 219, 0);
+}
+
+.file-name-modal-overlay.dark-theme .file-name-input-container:focus-within {
+  border-color: rgba(147, 112, 219, 0.6);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 4px rgba(147, 112, 219, 0.2),
+    0 4px 16px rgba(147, 112, 219, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Light theme input container */
+.file-name-modal-overlay.light-theme .file-name-input-container {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 0 0 0 rgba(1, 113, 226, 0);
+}
+
+.file-name-modal-overlay.light-theme .file-name-input-container:focus-within {
+  border-color: #0171E2;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 0 0 4px rgba(1, 113, 226, 0.15),
+    0 8px 24px rgba(1, 113, 226, 0.2);
+  transform: translateY(-1px);
+}
+
+.file-name-input {
+  flex: 1;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  outline: none;
+}
+
+/* Dark theme input */
+.file-name-modal-overlay.dark-theme .file-name-input {
+  color: white;
+}
+
+.file-name-modal-overlay.dark-theme .file-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Light theme input */
+.file-name-modal-overlay.light-theme .file-name-input {
+  color: #1a202c;
+}
+
+.file-name-modal-overlay.light-theme .file-name-input::placeholder {
+  color: #a0aec0;
+}
+
+.file-extension {
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-left: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme extension */
+.file-name-modal-overlay.dark-theme .file-extension {
+  color: rgba(147, 112, 219, 0.9);
+  border-left-color: rgba(255, 255, 255, 0.1);
+  background: rgba(147, 112, 219, 0.1);
+}
+
+/* Light theme extension */
+.file-name-modal-overlay.light-theme .file-extension {
+  color: #0171E2;
+  border-left-color: rgba(0, 0, 0, 0.1);
+  background: rgba(1, 113, 226, 0.05);
+}
+
+.input-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme hint */
+.file-name-modal-overlay.dark-theme .input-hint {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light theme hint */
+.file-name-modal-overlay.light-theme .input-hint {
+  color: #718096;
+}
+
+.file-name-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 2rem 1.5rem 2rem;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme modal footer */
+.file-name-modal-overlay.dark-theme .file-name-modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme modal footer */
+.file-name-modal-overlay.light-theme .file-name-modal-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal-cancel-button,
+.modal-save-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dark theme cancel button */
+.file-name-modal-overlay.dark-theme .modal-cancel-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.file-name-modal-overlay.dark-theme .modal-cancel-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme cancel button */
+.file-name-modal-overlay.light-theme .modal-cancel-button {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #4a5568;
+}
+
+.file-name-modal-overlay.light-theme .modal-cancel-button:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #2d3748;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme save button */
+.file-name-modal-overlay.dark-theme .modal-save-button {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 0.8) 0%, 
+    rgba(186, 156, 255, 0.9) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.4);
+  color: white;
+  box-shadow: 
+    0 4px 16px rgba(147, 112, 219, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.file-name-modal-overlay.dark-theme .modal-save-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 1) 0%, 
+    rgba(186, 156, 255, 1) 100%
+  );
+  border-color: rgba(147, 112, 219, 0.6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(147, 112, 219, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Light theme save button */
+.file-name-modal-overlay.light-theme .modal-save-button {
+  background: linear-gradient(135deg, 
+    #0171E2 0%, 
+    #4A90E2 100%
+  );
+  border: 1px solid #0171E2;
+  color: white;
+  box-shadow: 
+    0 4px 16px rgba(1, 113, 226, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.file-name-modal-overlay.light-theme .modal-save-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, 
+    #005bb5 0%, 
+    #3a7bd5 100%
+  );
+  border-color: #005bb5;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(1, 113, 226, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Disabled state */
+.modal-save-button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.modal-cancel-button:active,
+.modal-save-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Animations */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .file-name-modal-container {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+  
+  .file-name-modal-header,
+  .file-name-modal-content,
+  .file-name-modal-footer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .modal-title-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .file-name-modal-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .modal-cancel-button,
+  .modal-save-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

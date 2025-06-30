@@ -1,0 +1,195 @@
+.header {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme styles */
+.header.dark-theme {
+  background: #000000; /* Fondo negro sólido sin gradiente */
+}
+
+/* Light theme styles - Apple inspired */
+.header.light-theme {
+  background: linear-gradient(135deg, 
+    #FDFDFE 0%, 
+    #F8F8F6 25%, 
+    #F5F4F6 50%, 
+    #D4EBF6 75%, 
+    #F5F4F6 100%
+  );
+}
+
+.header.light-theme::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(1, 113, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 235, 246, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(245, 244, 246, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.overlay {
+  position: relative;
+  z-index: 15;
+  width: 100%;
+  max-width: 1200px;
+  padding: calc(var(--spacing-unit) * 4);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s var(--transition-timing);
+}
+
+.overlay.visible {
+  opacity: 1;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 3);
+}
+
+.title {
+  margin-bottom: calc(var(--spacing-unit) * 2);
+  animation: fadeIn 1s var(--transition-timing) both;
+  animation-delay: 0.3s;
+}
+
+.title-text {
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  position: relative;
+  display: inline-block;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: titlePulse 4s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme title */
+.header.dark-theme .title-text {
+  color: var(--color-text);
+  background: radial-gradient(
+    circle at var(--mouse-x) var(--mouse-y),
+    rgba(0, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.9) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    var(--color-text) 85%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+/* Light theme title - Apple style */
+.header.light-theme .title-text {
+  background: linear-gradient(135deg, 
+    #0171E2 0%, 
+    #0056b3 25%, 
+    #003d80 50%, 
+    #0171E2 75%, 
+    #004080 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 
+    0 2px 4px rgba(1, 113, 226, 0.1),
+    0 4px 8px rgba(1, 113, 226, 0.05);
+  filter: drop-shadow(0 2px 4px rgba(1, 113, 226, 0.1));
+}
+
+@keyframes titlePulse {
+  0% {
+    opacity: 0.95;
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.85;
+    filter: blur(0.3px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+.audio-control-button {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.audio-control-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.subtitle {
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  font-weight: 400;
+  max-width: 800px;
+  opacity: 0.9;
+  animation: fadeIn 1s var(--transition-timing) both;
+  animation-delay: 0.6s;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light theme subtitle */
+.header.light-theme .subtitle {
+  color: #4a5568;
+}
+
+.info-text {
+  font-size: 0.875rem;
+  opacity: 0.7;
+  margin-top: calc(var(--spacing-unit) * 3);
+  max-width: 500px;
+  animation: fadeIn 1s var(--transition-timing) both;
+  animation-delay: 1.2s;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light theme info text */
+.header.light-theme .info-text {
+  color: #718096;
+}
+
+@media (max-width: 768px) {
+  .overlay {
+    padding: calc(var(--spacing-unit) * 2);
+  }
+  
+  .title-text {
+    font-size: 3rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+}

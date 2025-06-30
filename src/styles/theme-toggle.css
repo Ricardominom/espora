@@ -1,0 +1,136 @@
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Default positioning for landing page */
+.theme-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 20;
+}
+
+/* Specific positioning for menu page */
+.menu-page .theme-toggle {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 1;
+}
+
+.toggle-track {
+  width: 60px;
+  height: 32px;
+  border-radius: 16px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Dark mode track */
+.theme-toggle.dark .toggle-track {
+  background: linear-gradient(135deg, 
+    rgba(30, 30, 40, 0.9) 0%, 
+    rgba(20, 20, 30, 0.95) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light mode track */
+.theme-toggle.light .toggle-track {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(248, 250, 252, 0.98) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.toggle-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode thumb */
+.theme-toggle.dark .toggle-thumb {
+  left: 31px;
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 0.9) 0%, 
+    rgba(186, 156, 255, 0.95) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+/* Light mode thumb */
+.theme-toggle.light .toggle-thumb {
+  left: 3px;
+  background: linear-gradient(135deg, 
+    #007AFF 0%, 
+    #5AC8FA 100%
+  );
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 122, 255, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-icon {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode icon */
+.theme-toggle.dark .toggle-icon {
+  color: white;
+  filter: drop-shadow(0 0 4px rgba(147, 112, 219, 0.6));
+}
+
+/* Light mode icon */
+.theme-toggle.light .toggle-icon {
+  color: white;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+}
+
+.theme-toggle:hover .toggle-track {
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.theme-toggle.light:hover .toggle-track {
+  box-shadow: 
+    0 6px 20px rgba(0, 122, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Smooth transitions for theme changes */
+.theme-toggle * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,459 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(1px);
+  transition: all 0.3s ease;
+}
+
+/* Dark theme modal overlay */
+.dark-theme .modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Light theme modal overlay */
+.light-theme .modal-overlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.modal-container {
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  animation: slideUp 0.2s ease-out;
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Dark theme modal container */
+.dark-theme .modal-container {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(147, 112, 219, 0.2);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.3),
+    0 0 50px rgba(88, 51, 139, 0.15);
+}
+
+/* Light theme modal container */
+.light-theme .modal-container {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme modal header */
+.dark-theme .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme modal header */
+.light-theme .modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme modal title */
+.dark-theme .modal-header h2 {
+  color: white;
+}
+
+/* Light theme modal title */
+.light-theme .modal-header h2 {
+  color: #1a202c;
+}
+
+.modal-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-title-icon {
+  transition: color 0.3s ease;
+}
+
+/* Dark theme modal title icon */
+.dark-theme .modal-title-icon {
+  color: rgba(147, 112, 219, 0.9);
+}
+
+/* Light theme modal title icon */
+.light-theme .modal-title-icon {
+  color: #0171E2;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme close button */
+.dark-theme .close-button {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark-theme .close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Light theme close button */
+.light-theme .close-button {
+  color: #718096;
+}
+
+.light-theme .close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a202c;
+  transform: rotate(90deg);
+}
+
+.modal-form {
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  grid-column: span 2;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme label */
+.dark-theme label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Light theme label */
+.light-theme label {
+  color: #2d3748;
+}
+
+.icon {
+  transition: color 0.3s ease;
+}
+
+/* Dark theme icon */
+.dark-theme .icon {
+  color: rgba(147, 112, 219, 0.9);
+}
+
+/* Light theme icon */
+.light-theme .icon {
+  color: #0171E2;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+/* Dark theme form input */
+.dark-theme .form-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dark-theme .form-input:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-theme .form-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(147, 112, 219, 0.5);
+  box-shadow: 0 0 0 2px rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme form input */
+.light-theme .form-input {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #1a202c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .form-input:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.light-theme .form-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  border-color: #0171E2;
+  box-shadow: 0 0 0 3px rgba(1, 113, 226, 0.15);
+}
+
+.light-theme .form-input::placeholder {
+  color: #a0aec0;
+}
+
+select.form-input {
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+  background-attachment: fixed;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 1.1rem;
+  text-align: left;
+}
+
+/* Dark theme select */
+.dark-theme select.form-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(147, 112, 219, 0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-size: 18px;
+  background-repeat: no-repeat;
+}
+
+/* Light theme select */
+.light-theme select.form-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-size: 18px;
+  background-repeat: no-repeat;
+}
+
+select.form-input option {
+  padding: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Dark theme select options */
+.dark-theme select.form-input option {
+  background: rgba(26, 11, 46, 0.95);
+  color: white;
+}
+
+.dark-theme select.form-input:focus option:hover,
+.dark-theme select.form-input:focus option:focus,
+.dark-theme select.form-input:focus option:active,
+.dark-theme select.form-input:focus option:checked {
+  background: rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme select options */
+.light-theme select.form-input option {
+  background: rgba(255, 255, 255, 0.98);
+  color: #1a202c;
+}
+
+.light-theme select.form-input:focus option:hover,
+.light-theme select.form-input:focus option:focus,
+.light-theme select.form-input:focus option:active,
+.light-theme select.form-input:focus option:checked {
+  background: rgba(1, 113, 226, 0.1);
+}
+
+.social-media-section {
+  grid-column: span 2;
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.social-media-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  grid-column: span 2;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme social media section h3 */
+.dark-theme .social-media-section h3 {
+  color: white;
+}
+
+/* Light theme social media section h3 */
+.light-theme .social-media-section h3 {
+  color: #1a202c;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  grid-column: span 2;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme modal footer */
+.dark-theme .modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme modal footer */
+.light-theme .modal-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.cancel-button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Dark theme cancel button */
+.dark-theme .cancel-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dark-theme .cancel-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Light theme cancel button */
+.light-theme .cancel-button {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #4a5568;
+}
+
+.light-theme .cancel-button:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #2d3748;
+}
+
+.submit-button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Dark theme submit button */
+.dark-theme .submit-button {
+  background: rgba(147, 112, 219, 0.2);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+  color: white;
+}
+
+.dark-theme .submit-button:hover {
+  background: rgba(147, 112, 219, 0.3);
+  border-color: rgba(147, 112, 219, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Light theme submit button */
+.light-theme .submit-button {
+  background: #0171E2;
+  border: 1px solid #0171E2;
+  color: white;
+  box-shadow: 0 2px 8px rgba(1, 113, 226, 0.2);
+}
+
+.light-theme .submit-button:hover {
+  background: #005bb5;
+  border-color: #005bb5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-form {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  
+  .form-row {
+    grid-column: span 1;
+    flex-direction: column;
+  }
+  
+  .social-media-section {
+    grid-template-columns: 1fr;
+    grid-column: span 1;
+  }
+}

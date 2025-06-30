@@ -1,0 +1,1206 @@
+/* Account Page Styles - Formulario con Pestañas */
+.account-page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.account-page::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dark theme account page */
+.account-page.dark-theme {
+  background: linear-gradient(135deg, #0a0514 0%, #1a0b2e 100%);
+}
+
+/* Light theme account page */
+.account-page.light-theme {
+  background: linear-gradient(135deg, 
+    #FDFDFE 0%, 
+    #F8F8F6 25%, 
+    #F5F4F6 50%, 
+    #D4EBF6 75%, 
+    #F5F4F6 100%
+  );
+}
+
+.account-page.light-theme::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(1, 113, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 235, 246, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Header Styles */
+.account-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  z-index: 20;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  margin: -0.5rem -0.5rem 1rem -0.5rem;
+  width: calc(100% + 1rem);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 1rem;
+}
+
+/* Breadcrumb Container */
+.account-breadcrumb-container {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  justify-self: start;
+  max-height: 28px;
+  margin-left: -1.5%;
+}
+
+/* Dark theme breadcrumb container */
+.account-page.dark-theme .account-breadcrumb-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+.account-page.dark-theme .account-breadcrumb-container:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(147, 112, 219, 0.5);
+  box-shadow: 0 4px 16px rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme breadcrumb container */
+.account-page.light-theme .account-breadcrumb-container {
+  background: rgba(253, 253, 254, 0.9);
+  border: 1px solid rgba(1, 113, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(1, 113, 226, 0.1);
+}
+
+.account-page.light-theme .account-breadcrumb-container:hover {
+  background: rgba(253, 253, 254, 1);
+  border-color: rgba(1, 113, 226, 0.5);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.2);
+}
+
+/* Breadcrumb Links */
+.account-breadcrumb-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  position: relative;
+  font-size: inherit;
+}
+
+/* Dark theme breadcrumb links */
+.account-page.dark-theme .account-breadcrumb-link {
+  color: rgba(147, 112, 219, 0.9);
+}
+
+.account-page.dark-theme .account-breadcrumb-link:hover {
+  color: rgba(147, 112, 219, 1);
+  background: rgba(147, 112, 219, 0.1);
+  text-shadow: 0 0 8px rgba(147, 112, 219, 0.6);
+  transform: scale(1.05);
+}
+
+.account-page.dark-theme .account-breadcrumb-link:active {
+  transform: scale(0.95);
+  background: rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme breadcrumb links */
+.account-page.light-theme .account-breadcrumb-link {
+  color: #0171E2;
+}
+
+.account-page.light-theme .account-breadcrumb-link:hover {
+  color: #005bb5;
+  background: rgba(1, 113, 226, 0.1);
+  transform: scale(1.05);
+}
+
+.account-page.light-theme .account-breadcrumb-link:active {
+  transform: scale(0.95);
+  background: rgba(1, 113, 226, 0.2);
+}
+
+/* Breadcrumb Separators */
+.account-breadcrumb-separator {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  opacity: 0.6;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme separators */
+.account-page.dark-theme .account-breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light theme separators */
+.account-page.light-theme .account-breadcrumb-separator {
+  color: #718096;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* Dark theme header */
+.account-page.dark-theme .account-header {
+  background: rgba(88, 51, 139, 0.15);
+  border-bottom: 1px solid rgba(88, 51, 139, 0.2);
+}
+
+/* Light theme header */
+.account-page.light-theme .account-header {
+  background: rgba(253, 253, 254, 0.95);
+  border-bottom: 1px solid rgba(212, 235, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.08);
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.875rem;
+  margin: 0;
+  white-space: nowrap;
+  justify-self: start;
+}
+
+/* Dark theme back link */
+.account-page.dark-theme .back-link {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.account-page.dark-theme .back-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme back link */
+.account-page.light-theme .back-link {
+  color: #718096;
+  background: rgba(253, 253, 254, 0.9);
+  border: 1px solid rgba(212, 235, 246, 0.3);
+}
+
+.account-page.light-theme .back-link:hover {
+  color: #0171E2;
+  background: rgba(253, 253, 254, 1);
+  border-color: rgba(1, 113, 226, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.15);
+}
+
+.client-name {
+  font-size: 2.5rem !important;
+  font-weight: 900 !important;
+  margin: 0;
+  letter-spacing: -0.02em;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  justify-self: center;
+  grid-column: 2;
+  line-height: 1.1 !important;
+}
+
+/* Dark theme client name */
+.account-page.dark-theme .client-name {
+  color: white;
+  text-shadow: 0 2px 10px rgba(88, 51, 139, 0.2);
+}
+
+/* Light theme client name */
+.account-page.light-theme .client-name {
+  background: linear-gradient(135deg, 
+    #0171E2 0%, 
+    #4A90E2 50%, 
+    #0056b3 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.account-button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Dark theme account button */
+.account-page.dark-theme .account-button {
+  background: rgba(147, 112, 219, 0.2);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+  color: white;
+}
+
+.account-page.dark-theme .account-button:hover {
+  background: rgba(147, 112, 219, 0.3);
+  border-color: rgba(147, 112, 219, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Light theme account button */
+.account-page.light-theme .account-button {
+  background: rgba(1, 113, 226, 0.1);
+  border: 1px solid rgba(1, 113, 226, 0.2);
+  color: #0171E2;
+}
+
+.account-page.light-theme .account-button:hover {
+  background: rgba(1, 113, 226, 0.15);
+  border-color: rgba(1, 113, 226, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Content Styles */
+.account-content {
+  flex: 1;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0;
+  min-height: calc(100vh - 120px);
+  height: auto;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  padding: 0 1rem;
+  align-items: start;
+}
+
+.account-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Tabs Navigation */
+.tabs-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tabs-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tabs-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme tabs title */
+.account-page.dark-theme .tabs-title {
+  color: white;
+}
+
+/* Light theme tabs title */
+.account-page.light-theme .tabs-title {
+  color: #2c3e50;
+}
+
+.tabs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 300px;
+  min-width: 300px;
+  flex-shrink: 0;
+}
+
+/* Asegurar que los botones de pestañas ocupen todo el ancho disponible */
+.tab-button {
+  width: 100% !important;
+  min-width: 250px !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.65rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Dark theme tab button */
+.account-page.dark-theme .tab-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.account-page.dark-theme .tab-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.account-page.dark-theme .tab-button.active {
+  background: rgba(147, 112, 219, 0.2);
+  border-color: rgba(147, 112, 219, 0.4);
+  color: white;
+}
+
+/* Light theme tab button */
+.account-page.light-theme .tab-button {
+  background: rgba(253, 253, 254, 0.9);
+  border: 1px solid rgba(212, 235, 246, 0.3);
+  color: #4a5568;
+}
+
+.account-page.light-theme .tab-button:hover {
+  background: rgba(253, 253, 254, 1);
+  border-color: rgba(1, 113, 226, 0.2);
+}
+
+.account-page.light-theme .tab-button.active {
+  background: rgba(1, 113, 226, 0.1);
+  border-color: rgba(1, 113, 226, 0.3);
+  color: #0171E2;
+}
+
+/* Disabled state for tab buttons */
+.tab-button.disabled,
+.tab-button:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+/* Dark theme disabled tab button */
+.account-page.dark-theme .tab-button.disabled,
+.account-page.dark-theme .tab-button:disabled {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.account-page.dark-theme .tab-button.disabled .tab-number,
+.account-page.dark-theme .tab-button:disabled .tab-number {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Light theme disabled tab button */
+.account-page.light-theme .tab-button.disabled,
+.account-page.light-theme .tab-button:disabled {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.05) !important;
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.account-page.light-theme .tab-button.disabled .tab-number,
+.account-page.light-theme .tab-button:disabled .tab-number {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Prevent hover effects on disabled buttons */
+.tab-button.disabled:hover,
+.tab-button:disabled:hover {
+  background: inherit !important;
+  border-color: inherit !important;
+  color: inherit !important;
+  transform: none !important;
+}
+
+.tab-button.disabled:hover .tab-number,
+.tab-button:disabled:hover .tab-number {
+  background: inherit !important;
+  color: inherit !important;
+}
+
+.tab-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme tab number */
+.account-page.dark-theme .tab-number {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.account-page.dark-theme .tab-button.active .tab-number {
+  background: rgba(147, 112, 219, 0.8);
+  color: white;
+}
+
+/* Light theme tab number */
+.account-page.light-theme .tab-number {
+  background: rgba(212, 235, 246, 0.5);
+  color: #718096;
+}
+
+.account-page.light-theme .tab-button.active .tab-number {
+  background: #0171E2;
+  color: white;
+}
+
+.tab-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  overflow: hidden;
+  min-width: 0; /* Permite que el contenedor se encoja si es necesario */
+}
+
+.tab-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  width: 100%;
+  overflow: visible;
+  white-space: normal;
+  word-wrap: break-word;
+  display: block;
+}
+
+.tab-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  line-height: 1.2;
+}
+
+.tab-no-items {
+  font-size: 0.65rem;
+  font-style: italic;
+  line-height: 1.2;
+  margin-top: 0.25rem;
+  transition: color 0.3s ease;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+  width: 100%;
+  display: block;
+  padding-right: 0.2rem;
+}
+
+/* Dark theme tab no items */
+.account-page.dark-theme .tab-no-items {
+  color: rgba(255, 165, 0, 0.7);
+}
+
+/* Light theme tab no items */
+.account-page.light-theme .tab-no-items {
+  color: #f39c12;
+  font-weight: 500;
+}
+
+/* Form Content */
+.form-content {
+  display: flex;
+  flex-direction: column; 
+  gap: 0.5rem;
+  overflow-y: visible;
+  padding-right: 0.75rem;
+  scrollbar-width: thin;
+  height: auto;
+  flex: 1;
+}
+
+/* Dark theme form content scrollbar */
+.account-page.dark-theme .form-content {
+  scrollbar-color: rgba(147, 112, 219, 0.5) rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme form content scrollbar */
+.account-page.light-theme .form-content {
+  scrollbar-color: rgba(1, 113, 226, 0.5) rgba(212, 235, 246, 0.2);
+}
+
+.form-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.form-content::-webkit-scrollbar-track {
+  border-radius: 4px;
+}
+
+/* Dark theme scrollbar track */
+.account-page.dark-theme .form-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme scrollbar track */
+.account-page.light-theme .form-content::-webkit-scrollbar-track {
+  background: rgba(212, 235, 246, 0.2);
+}
+
+.form-content::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
+
+/* Dark theme scrollbar thumb */
+.account-page.dark-theme .form-content::-webkit-scrollbar-thumb {
+  background: rgba(147, 112, 219, 0.5);
+}
+
+/* Light theme scrollbar thumb */
+.account-page.light-theme .form-content::-webkit-scrollbar-thumb {
+  background: rgba(1, 113, 226, 0.5);
+}
+
+/* Form Items */
+.form-items {
+  display: block;
+  flex: 1;
+  height: fit-content;
+  min-height: auto;
+  max-height: calc(100vh - 120px);
+  border-radius: 0px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  /* Centrado vertical para secciones pequeñas */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Aumentar tamaño 2% */
+  transform: scale(1.02);
+  transform-origin: center;
+}
+
+/* Secciones específicas que deben centrarse (pocas items) */
+.form-items.small-section {
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Secciones grandes que deben usar scroll normal */
+.form-items.large-section {
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+/* Dark theme form items container */
+.account-page.dark-theme .form-items {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme form items container */
+.account-page.light-theme .form-items {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.form-item {
+  border-radius: 0px;
+  padding: 0.35rem 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  border-bottom: 1px solid transparent;
+  margin: 0;
+}
+
+/* Dark theme form item */
+.account-page.dark-theme .form-item {
+  background: transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.account-page.dark-theme .form-item.selected {
+  background: rgba(147, 112, 219, 0.08);
+  border-bottom-color: rgba(147, 112, 219, 0.2);
+}
+
+.account-page.dark-theme .form-item.disabled {
+  opacity: 1;
+  background: transparent;
+}
+
+/* Light theme form item */
+.account-page.light-theme .form-item {
+  background: transparent;
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.account-page.light-theme .form-item.selected {
+  background: rgba(1, 113, 226, 0.05);
+  border-bottom-color: rgba(1, 113, 226, 0.2);
+}
+
+.account-page.light-theme .form-item.disabled {
+  opacity: 1;
+  background: transparent;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-item:hover {
+  transform: none;
+}
+
+/* Dark theme form item hover */
+.account-page.dark-theme .form-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Light theme form item hover */
+.account-page.light-theme .form-item:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.2rem;
+  min-height: 28px;
+}
+
+.item-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  height: 28px;
+}
+
+.checkbox {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  margin: 0;
+  display: block;
+  opacity: 1 !important;
+  visibility: visible !important;
+  flex-shrink: 0;
+}
+
+/* Dark theme checkbox */
+.account-page.dark-theme .checkbox {
+  border: 2px solid rgba(147, 112, 219, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.account-page.dark-theme .checkbox:hover {
+  border-color: rgba(147, 112, 219, 1);
+  background: rgba(147, 112, 219, 0.15);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(147, 112, 219, 0.3);
+}
+
+.account-page.dark-theme .checkbox:checked {
+  background: rgba(147, 112, 219, 1);
+  border-color: rgba(147, 112, 219, 1);
+  box-shadow: 0 4px 12px rgba(147, 112, 219, 0.4);
+}
+
+/* Light theme checkbox */
+.account-page.light-theme .checkbox {
+  border: 2px solid rgba(1, 113, 226, 0.7);
+  background: rgba(253, 253, 254, 1);
+  box-shadow: 0 2px 6px rgba(1, 113, 226, 0.1);
+}
+
+.account-page.light-theme .checkbox:hover {
+  border-color: rgba(1, 113, 226, 0.9);
+  background: rgba(1, 113, 226, 0.08);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(1, 113, 226, 0.2);
+}
+
+.account-page.light-theme .checkbox:checked {
+  background: #0171E2;
+  border-color: #0171E2;
+  box-shadow: 0 4px 12px rgba(1, 113, 226, 0.3);
+}
+
+.checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 1px 1px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+}
+
+.checkbox-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: 32px;
+  gap: 0.5rem;
+}
+
+.account-item-id {
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  opacity: 1 !important;
+  visibility: visible !important;
+  line-height: 1;
+  display: inline-block;
+  min-height: auto;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* Dark theme account item id */
+.account-page.dark-theme .account-item-id {
+  background: rgba(147, 112, 219, 0.3);
+  color: rgba(147, 112, 219, 1);
+  border: 1px solid rgba(147, 112, 219, 0.4);
+}
+
+/* Light theme account item id */
+.account-page.light-theme .account-item-id {
+  background: rgba(1, 113, 226, 0.2);
+  color: #0056b3;
+  font-weight: 700;
+  border: 1px solid rgba(1, 113, 226, 0.4);
+}
+
+.item-concept {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.item-concept h4 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.1;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  align-self: center;
+}
+
+/* Dark theme item concept */
+.account-page.dark-theme .item-concept h4 {
+  color: white;
+}
+
+/* Light theme item concept */
+.account-page.light-theme .item-concept h4 {
+  color: #2c3e50;
+}
+
+/* Input Groups */
+.item-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+  gap: 0.25rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.03rem;
+}
+
+.input-group label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme input label */
+.account-page.dark-theme .input-group label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Light theme input label */
+.account-page.light-theme .input-group label {
+  color: #4a5568;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.06rem 0.12rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  height: 7px;
+  text-align: right;
+}
+
+/* Dark theme form input */
+.account-page.dark-theme .form-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.account-page.dark-theme .form-input:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.account-page.dark-theme .form-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(147, 112, 219, 0.5);
+  box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.2);
+}
+
+.account-page.dark-theme .form-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Light theme form input */
+.account-page.light-theme .form-input {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #1a202c;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.account-page.light-theme .form-input:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.account-page.light-theme .form-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  border-color: #0171E2;
+  box-shadow: 0 0 0 3px rgba(1, 113, 226, 0.2);
+}
+
+.account-page.light-theme .form-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(248, 250, 252, 0.5);
+}
+
+.account-page.light-theme .form-input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.input-with-prefix,
+.input-with-suffix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-prefix,
+.input-suffix {
+  position: absolute;
+  font-size: 0.85rem;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme prefix/suffix */
+.account-page.dark-theme .input-prefix,
+.account-page.dark-theme .input-suffix {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light theme prefix/suffix */
+.account-page.light-theme .input-prefix,
+.account-page.light-theme .input-suffix {
+  color: #4a5568;
+  font-weight: 800;
+}
+
+.input-prefix {
+  left: 0.15rem;
+}
+
+.input-suffix {
+  right: 0.15rem;
+}
+
+.input-with-prefix .form-input {
+  padding-left: 0.6rem;
+}
+
+.input-with-suffix .form-input {
+  padding-right: 0.6rem;
+}
+
+.subtotal-display {
+  padding: 0.08rem 0.15rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* Dark theme subtotal display */
+.account-page.dark-theme .subtotal-display {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: rgba(34, 197, 94, 0.9);
+}
+
+/* Light theme subtotal display */
+.account-page.light-theme .subtotal-display {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #047857;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
+}
+
+/* Continue Button */
+.continue-button-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 30;
+  opacity: 0;
+  animation: slideUpSimple 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideUpSimple {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.continue-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+
+/* Dark theme continue button */
+.account-page.dark-theme .continue-button {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 0.8) 0%, 
+    rgba(186, 156, 255, 0.9) 100%
+  );
+  color: white;
+  box-shadow: 
+    0 4px 16px rgba(147, 112, 219, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-page.dark-theme .continue-button:hover {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 0.9) 0%, 
+    rgba(186, 156, 255, 1) 100%
+  );
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(147, 112, 219, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme continue button */
+.account-page.light-theme .continue-button {
+  background: linear-gradient(135deg, 
+    #0171E2 0%, 
+    #4A90E2 100%
+  );
+  color: white !important;
+  box-shadow: 
+    0 4px 16px rgba(1, 113, 226, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-page.light-theme .continue-button:hover {
+  background: linear-gradient(135deg, 
+    #005bb5 0%, 
+    #3a7bd5 100%
+  );
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(1, 113, 226, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  color: white !important;
+}
+
+.continue-button:active {
+  transform: translateY(0) scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Disabled state for continue button */
+.continue-button.disabled,
+.continue-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+/* Dark theme disabled button */
+.account-page.dark-theme .continue-button.disabled,
+.account-page.dark-theme .continue-button:disabled {
+  background: rgba(147, 112, 219, 0.3) !important;
+  box-shadow: 
+    0 2px 8px rgba(147, 112, 219, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Light theme disabled button */
+.account-page.light-theme .continue-button.disabled,
+.account-page.light-theme .continue-button:disabled {
+  background: rgba(1, 113, 226, 0.3) !important;
+  box-shadow: 
+    0 2px 8px rgba(1, 113, 226, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.continue-button.disabled:hover,
+.continue-button:disabled:hover {
+  transform: none !important;
+  background: inherit !important;
+  box-shadow: inherit !important;
+}
+
+.button-text {
+  font-family: var(--font-primary);
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+  color: white !important;
+}
+
+/* Asegurar texto blanco en ambos temas */
+.account-page.light-theme .button-text,
+.account-page.dark-theme .button-text {
+  color: white !important;
+}
+
+.account-page.light-theme .continue-button .button-text,
+.account-page.dark-theme .continue-button .button-text {
+  color: white !important;
+}
+
+.account-page.light-theme .continue-button:hover .button-text,
+.account-page.dark-theme .continue-button:hover .button-text {
+  color: white !important;
+} 

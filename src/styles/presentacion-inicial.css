@@ -1,0 +1,861 @@
+/* Presentación Inicial Page Styles */
+.presentacion-inicial-page {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme presentacion page */
+.presentacion-inicial-page.dark-theme {
+  background: linear-gradient(135deg, #0a0514 0%, #1a0b2e 100%);
+}
+
+/* Light theme presentacion page */
+.presentacion-inicial-page.light-theme {
+  background: linear-gradient(135deg, 
+    #FDFDFE 0%, 
+    #F8F8F6 25%, 
+    #F5F4F6 50%, 
+    #D4EBF6 75%, 
+    #F5F4F6 100%
+  );
+}
+
+.presentacion-inicial-page.light-theme::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(1, 113, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 235, 246, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.presentacion-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  z-index: 20;
+  width: 100%;
+  padding: 1rem 2rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 1rem;
+  grid-template-rows: auto auto;
+  row-gap: 1rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.presentacion-breadcrumb-container {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  justify-self: start;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  max-height: 28px;
+  margin-left: -2%;
+}
+
+/* Dark theme breadcrumb container */
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-container:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(147, 112, 219, 0.5);
+  box-shadow: 0 4px 16px rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme breadcrumb container */
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-container {
+  background: rgba(253, 253, 254, 0.9);
+  border: 1px solid rgba(1, 113, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(1, 113, 226, 0.1);
+}
+
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-container:hover {
+  background: rgba(253, 253, 254, 1);
+  border-color: rgba(1, 113, 226, 0.5);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.2);
+}
+
+.presentacion-breadcrumb-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  position: relative;
+  font-size: inherit;
+}
+
+/* Dark theme breadcrumb links */
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-link {
+  color: rgba(147, 112, 219, 0.9);
+}
+
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-link:hover {
+  color: rgba(147, 112, 219, 1);
+  background: rgba(147, 112, 219, 0.1);
+  text-shadow: 0 0 8px rgba(147, 112, 219, 0.6);
+  transform: scale(1.05);
+}
+
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-link:active {
+  transform: scale(0.95);
+  background: rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme breadcrumb links */
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-link {
+  color: #0171E2;
+}
+
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-link:hover {
+  color: #005bb5;
+  background: rgba(1, 113, 226, 0.1);
+  transform: scale(1.05);
+}
+
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-link:active {
+  transform: scale(0.95);
+  background: rgba(1, 113, 226, 0.2);
+}
+
+.presentacion-breadcrumb-separator {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  opacity: 0.6;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme separators */
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light theme separators */
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-separator {
+  color: #718096;
+}
+
+/* Current page indicator - no navigation */
+.presentacion-inicial-page .presentacion-breadcrumb-link.current-page {
+  cursor: default;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.presentacion-inicial-page .presentacion-breadcrumb-link.current-page:hover {
+  background: none !important;
+  transform: none !important;
+  text-shadow: none !important;
+}
+
+/* Dark theme current page */
+.presentacion-inicial-page.dark-theme .presentacion-breadcrumb-link.current-page {
+  color: rgba(147, 112, 219, 1);
+}
+
+/* Light theme current page */
+.presentacion-inicial-page.light-theme .presentacion-breadcrumb-link.current-page {
+  color: #0171E2;
+}
+
+.presentacion-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  z-index: 10;
+  letter-spacing: -0.02em;
+  margin: 0;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  justify-self: center;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Dark theme title */
+.presentacion-inicial-page.dark-theme .presentacion-title {
+  color: white;
+  text-shadow: 0 2px 10px rgba(88, 51, 139, 0.2);
+}
+
+/* Light theme title */
+.presentacion-inicial-page.light-theme .presentacion-title {
+  background: linear-gradient(135deg, 
+    #0171E2 0%, 
+    #4A90E2 25%, 
+    #0056b3 50%, 
+    #003d80 75%, 
+    #0171E2 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 
+    0 2px 4px rgba(1, 113, 226, 0.1),
+    0 4px 8px rgba(1, 113, 226, 0.05);
+  filter: drop-shadow(0 2px 4px rgba(1, 113, 226, 0.1));
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-self: end;
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.presentacion-content {
+  flex: 1;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0;
+  min-height: calc(100vh - 120px);
+  height: auto;
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+}
+
+.presentacion-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Content Layout */
+.content-layout {
+  display: grid;
+  grid-template-columns: 70fr 30fr;
+  gap: 2rem;
+  height: 100%;
+  min-height: calc(100vh - 200px);
+}
+
+/* PDF Viewer Area - 70% */
+.pdf-viewer-area {
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme pdf viewer area */
+.presentacion-inicial-page.dark-theme .pdf-viewer-area {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.2),
+    0 0 100px rgba(88, 51, 139, 0.1);
+}
+
+/* Light theme pdf viewer area */
+.presentacion-inicial-page.light-theme .pdf-viewer-area {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.pdf-viewer-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme pdf viewer header */
+.presentacion-inicial-page.dark-theme .pdf-viewer-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme pdf viewer header */
+.presentacion-inicial-page.light-theme .pdf-viewer-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.pdf-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pdf-icon {
+  transition: color 0.3s ease;
+}
+
+/* Dark theme pdf icon */
+.presentacion-inicial-page.dark-theme .pdf-icon {
+  color: rgba(147, 112, 219, 0.9);
+}
+
+/* Light theme pdf icon */
+.presentacion-inicial-page.light-theme .pdf-icon {
+  color: #0171E2;
+}
+
+.pdf-details h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  transition: color 0.3s ease;
+}
+
+.pdf-details p {
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.8;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme pdf details */
+.presentacion-inicial-page.dark-theme .pdf-details h3 {
+  color: white;
+}
+
+.presentacion-inicial-page.dark-theme .pdf-details p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme pdf details */
+.presentacion-inicial-page.light-theme .pdf-details h3 {
+  color: #1a202c;
+}
+
+.presentacion-inicial-page.light-theme .pdf-details p {
+  color: #718096;
+}
+
+.pdf-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pdf-action-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  width: 36px;
+  height: 36px;
+}
+
+.download-btn {
+  color: white;
+}
+
+/* Dark theme download button */
+.presentacion-inicial-page.dark-theme .download-btn {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.presentacion-inicial-page.dark-theme .download-btn:hover {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: rgba(34, 197, 94, 0.5);
+  transform: scale(1.05);
+}
+
+/* Light theme download button */
+.presentacion-inicial-page.light-theme .download-btn {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.presentacion-inicial-page.light-theme .download-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.5);
+  transform: scale(1.05);
+}
+
+.delete-btn {
+  color: white;
+}
+
+/* Dark theme delete button */
+.presentacion-inicial-page.dark-theme .delete-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.presentacion-inicial-page.dark-theme .delete-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(1.05);
+}
+
+/* Light theme delete button */
+.presentacion-inicial-page.light-theme .delete-btn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.presentacion-inicial-page.light-theme .delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(1.05);
+}
+
+.pdf-viewer {
+  flex: 1;
+  padding: 0;
+  background: transparent;
+}
+
+.pdf-iframe {
+  border: none;
+  border-radius: 0 0 16px 16px;
+  background: white;
+}
+
+/* Empty Viewer State */
+.empty-viewer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  opacity: 0.8;
+}
+
+.empty-icon {
+  margin-bottom: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme empty icon */
+.presentacion-inicial-page.dark-theme .empty-icon {
+  color: rgba(147, 112, 219, 0.6);
+}
+
+.presentacion-inicial-page.light-theme .empty-icon {
+  color: rgba(1, 113, 226, 0.6);
+}
+
+.empty-viewer h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.empty-viewer p {
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme empty viewer text */
+.presentacion-inicial-page.dark-theme .empty-viewer h3 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.presentacion-inicial-page.dark-theme .empty-viewer p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme empty viewer text */
+.presentacion-inicial-page.light-theme .empty-viewer h3 {
+  color: #1a202c;
+}
+
+.presentacion-inicial-page.light-theme .empty-viewer p {
+  color: #4a5568;
+}
+
+/* PDF Upload Section - 30% */
+.pdf-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 100%;
+  min-width: 300px;
+}
+
+/* Upload Area */
+.upload-area {
+  border: 2px dashed transparent;
+  border-radius: 12px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Dark theme upload area */
+.presentacion-inicial-page.dark-theme .upload-area {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(147, 112, 219, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.presentacion-inicial-page.dark-theme .upload-area:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(147, 112, 219, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(147, 112, 219, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.presentacion-inicial-page.dark-theme .upload-area.drag-over {
+  background: rgba(147, 112, 219, 0.15);
+  border-color: rgba(147, 112, 219, 0.8);
+  transform: scale(1.02);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(147, 112, 219, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Light theme upload area */
+.presentacion-inicial-page.light-theme .upload-area {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(1, 113, 226, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.presentacion-inicial-page.light-theme .upload-area:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(1, 113, 226, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 0 20px rgba(1, 113, 226, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.presentacion-inicial-page.light-theme .upload-area.drag-over {
+  background: rgba(1, 113, 226, 0.1);
+  border-color: rgba(1, 113, 226, 0.8);
+  transform: scale(1.02);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    0 0 30px rgba(1, 113, 226, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.upload-icon {
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme upload icon */
+.presentacion-inicial-page.dark-theme .upload-icon {
+  color: rgba(147, 112, 219, 0.8);
+}
+
+.presentacion-inicial-page.dark-theme .upload-area:hover .upload-icon {
+  color: rgba(147, 112, 219, 1);
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 12px rgba(147, 112, 219, 0.6));
+}
+
+/* Light theme upload icon */
+.presentacion-inicial-page.light-theme .upload-icon {
+  color: #0171E2;
+}
+
+.presentacion-inicial-page.light-theme .upload-area:hover .upload-icon {
+  color: #005bb5;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 12px rgba(1, 113, 226, 0.4));
+}
+
+.upload-area h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  transition: color 0.3s ease;
+}
+
+.upload-area p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.upload-formats {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme upload area text */
+.presentacion-inicial-page.dark-theme .upload-area h3 {
+  color: white;
+}
+
+.presentacion-inicial-page.dark-theme .upload-area p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.presentacion-inicial-page.dark-theme .upload-formats {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light theme upload area text */
+.presentacion-inicial-page.light-theme .upload-area h3 {
+  color: #1a202c;
+}
+
+.presentacion-inicial-page.light-theme .upload-area p {
+  color: #4a5568;
+}
+
+.presentacion-inicial-page.light-theme .upload-formats {
+  color: #718096;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Current File Info */
+.current-file-info {
+  padding: 1.5rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme current file info */
+.presentacion-inicial-page.dark-theme .current-file-info {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme current file info */
+.presentacion-inicial-page.light-theme .current-file-info {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.current-file-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme current file info title */
+.presentacion-inicial-page.dark-theme .current-file-info h4 {
+  color: white;
+}
+
+/* Light theme current file info title */
+.presentacion-inicial-page.light-theme .current-file-info h4 {
+  color: #1a202c;
+}
+
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme file card */
+.presentacion-inicial-page.dark-theme .file-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme file card */
+.presentacion-inicial-page.light-theme .file-card {
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.file-card-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme file card icon */
+.presentacion-inicial-page.dark-theme .file-card-icon {
+  background: rgba(147, 112, 219, 0.2);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+/* Light theme file card icon */
+.presentacion-inicial-page.light-theme .file-card-icon {
+  background: rgba(1, 113, 226, 0.1);
+  border: 1px solid rgba(1, 113, 226, 0.2);
+}
+
+.file-card-info {
+  flex: 1;
+}
+
+.file-card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  word-break: break-word;
+  transition: color 0.3s ease;
+}
+
+.file-card-meta {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme file card text */
+.presentacion-inicial-page.dark-theme .file-card-name {
+  color: white;
+}
+
+.presentacion-inicial-page.dark-theme .file-card-meta {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme file card text */
+.presentacion-inicial-page.light-theme .file-card-name {
+  color: #1a202c;
+}
+
+.presentacion-inicial-page.light-theme .file-card-meta {
+  color: #718096;
+}
+
+/* Logo color overrides for presentacion inicial page */
+.presentacion-inicial-page.dark-theme .logo-image {
+  filter: brightness(0) invert(1) !important;
+  color: white !important;
+}
+
+.presentacion-inicial-page.light-theme .logo-image {
+  filter: brightness(0) !important;
+  color: #1a202c !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .content-layout {
+    grid-template-columns: 65fr 35fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .pdf-upload-section {
+    max-width: 100%;
+    min-width: auto;
+  }
+  
+  .presentacion-content {
+    padding: 1rem;
+  }
+  
+  .presentacion-title {
+    font-size: 1.5rem;
+  }
+  
+  .presentacion-breadcrumb-container {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-area {
+    padding: 2rem 1rem;
+    min-height: 200px;
+  }
+  
+  .upload-area h3 {
+    font-size: 1.1rem;
+  }
+  
+  .upload-area p {
+    font-size: 0.9rem;
+  }
+  
+  .presentacion-content {
+    padding: 0.5rem;
+  }
+  
+  .presentacion-title {
+    font-size: 1.25rem;
+  }
+}

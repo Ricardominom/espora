@@ -1,0 +1,1218 @@
+.workhub-page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme workhub page */
+.workhub-page.dark-theme {
+  background: linear-gradient(135deg, #0a0514 0%, #1a0b2e 100%);
+}
+
+/* Light theme workhub page */
+.workhub-page.light-theme {
+  background: linear-gradient(135deg, 
+    #FDFDFE 0%, 
+    #F8F8F6 25%, 
+    #F5F4F6 50%, 
+    #D4EBF6 75%, 
+    #F5F4F6 100%
+  );
+}
+
+.workhub-page.light-theme::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(1, 113, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 235, 246, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.workhub-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20;
+  width: 100%;
+  padding: 1rem 2rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.workhub-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  z-index: 10;
+  letter-spacing: -0.02em;
+  margin: 0.5rem 0;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme title */
+.workhub-page.dark-theme .workhub-title {
+  color: white;
+  text-shadow: 0 2px 10px rgba(88, 51, 139, 0.2);
+}
+
+/* Light theme title */
+.workhub-page.light-theme .workhub-title {
+  background: linear-gradient(135deg, 
+    #0171E2 0%, 
+    #4A90E2 25%, 
+    #0056b3 50%, 
+    #003d80 75%, 
+    #0171E2 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 
+    0 2px 4px rgba(1, 113, 226, 0.1),
+    0 4px 8px rgba(1, 113, 226, 0.05);
+  filter: drop-shadow(0 2px 4px rgba(1, 113, 226, 0.1));
+}
+
+.editing-hint {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme editing hint */
+.workhub-page.dark-theme .editing-hint {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme editing hint */
+.workhub-page.light-theme .editing-hint {
+  color: #718096;
+}
+
+.header-right {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Breadcrumb Container */
+.workhub-breadcrumb-container {
+  position: absolute;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  max-height: 32px;
+}
+
+/* Dark theme breadcrumb container */
+.workhub-page.dark-theme .workhub-breadcrumb-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+.workhub-page.dark-theme .workhub-breadcrumb-container:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(147, 112, 219, 0.5);
+  box-shadow: 0 4px 16px rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme breadcrumb container */
+.workhub-page.light-theme .workhub-breadcrumb-container {
+  background: rgba(253, 253, 254, 0.9);
+  border: 1px solid rgba(1, 113, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(1, 113, 226, 0.1);
+}
+
+.workhub-page.light-theme .workhub-breadcrumb-container:hover {
+  background: rgba(253, 253, 254, 1);
+  border-color: rgba(1, 113, 226, 0.5);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.2);
+}
+
+/* Breadcrumb Links */
+.workhub-breadcrumb-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Dark theme breadcrumb links */
+.workhub-page.dark-theme .workhub-breadcrumb-link {
+  color: rgba(147, 112, 219, 0.9);
+}
+
+.workhub-page.dark-theme .workhub-breadcrumb-link:hover {
+  color: rgba(147, 112, 219, 1);
+  background: rgba(147, 112, 219, 0.1);
+  text-shadow: 0 0 8px rgba(147, 112, 219, 0.6);
+  transform: scale(1.05);
+}
+
+.workhub-page.dark-theme .workhub-breadcrumb-link:active {
+  transform: scale(0.95);
+  background: rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme breadcrumb links */
+.workhub-page.light-theme .workhub-breadcrumb-link {
+  color: #0171E2;
+}
+
+.workhub-page.light-theme .workhub-breadcrumb-link:hover {
+  color: #005bb5;
+  background: rgba(1, 113, 226, 0.1);
+  transform: scale(1.05);
+}
+
+.workhub-page.light-theme .workhub-breadcrumb-link:active {
+  transform: scale(0.95);
+  background: rgba(1, 113, 226, 0.2);
+}
+
+/* Breadcrumb Separators */
+.workhub-breadcrumb-separator {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  opacity: 0.6;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme separators */
+.workhub-page.dark-theme .workhub-breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light theme separators */
+.workhub-page.light-theme .workhub-breadcrumb-separator {
+  color: #718096;
+}
+
+.workhub-content {
+  flex: 1;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0;
+  min-height: calc(100vh - 120px);
+  height: auto;
+  position: relative;
+  z-index: 2;
+  padding: 0 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.workhub-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 0;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: flex-start;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 120px;
+  border: 1px solid transparent;
+}
+
+/* Dark theme tab button */
+.workhub-page.dark-theme .tab-button {
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.workhub-page.dark-theme .tab-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.workhub-page.dark-theme .tab-button.active {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+  border-bottom: 1px solid rgba(59, 130, 246, 1);
+}
+
+/* Light theme tab button */
+.workhub-page.light-theme .tab-button {
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: #4a5568;
+}
+
+.workhub-page.light-theme .tab-button:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.workhub-page.light-theme .tab-button.active {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+  border-bottom: 1px solid rgba(59, 130, 246, 1);
+}
+
+/* Time Categories */
+.time-categories {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 1rem 0;
+}
+
+.time-category {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.time-category .selected-indicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme time category */
+.workhub-page.dark-theme .time-category {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.workhub-page.dark-theme .time-category:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.workhub-page.dark-theme .time-category.active {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+}
+
+.workhub-page.dark-theme .selected-indicator {
+  color: rgba(59, 130, 246, 0.9);
+}
+
+/* Light theme time category */
+.workhub-page.light-theme .time-category {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.workhub-page.light-theme .time-category:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.workhub-page.light-theme .time-category.active {
+  background: rgba(219, 234, 254, 0.9);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.workhub-page.light-theme .selected-indicator {
+  color: #3b82f6;
+}
+
+.category-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme category count */
+.workhub-page.dark-theme .category-count {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.workhub-page.dark-theme .time-category.active .category-count {
+  color: rgba(59, 130, 246, 1);
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Light theme category count */
+.workhub-page.light-theme .category-count {
+  color: #1a202c;
+}
+
+.workhub-page.light-theme .time-category.active .category-count {
+  color: #2563eb;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+.category-label {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme category label */
+.workhub-page.dark-theme .category-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.workhub-page.dark-theme .time-category.active .category-label {
+  color: rgba(59, 130, 246, 1);
+}
+
+/* Light theme category label */
+.workhub-page.light-theme .category-label {
+  color: #4a5568;
+}
+
+.workhub-page.light-theme .time-category.active .category-label {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* Task Cards Container */
+.task-cards-container {
+  width: 100%;
+  max-width: 1440px;
+  padding: 1.5rem;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme task cards container */
+.workhub-page.dark-theme .task-cards-container {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme task cards container */
+.workhub-page.light-theme .task-cards-container {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* Task Cards Grid */
+.task-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  min-height: 300px;
+}
+
+.task-card {
+  height: 144px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dark theme task card */
+.workhub-page.dark-theme .task-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.workhub-page.dark-theme .task-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme task card */
+.workhub-page.light-theme .task-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.workhub-page.light-theme .task-card:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Task Card Header */
+.task-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.task-card-section {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme section badge */
+.workhub-page.dark-theme .task-card-section {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgba(59, 130, 246, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Light theme section badge */
+.workhub-page.light-theme .task-card-section {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.task-card-date {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme date */
+.workhub-page.dark-theme .task-card-date {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme date */
+.workhub-page.light-theme .task-card-date {
+  color: #718096;
+}
+
+/* Task Card Content */
+.task-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.task-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme title */
+.workhub-page.dark-theme .task-card-title {
+  color: white;
+}
+
+/* Light theme title */
+.workhub-page.light-theme .task-card-title {
+  color: #1a202c;
+}
+
+.task-card-code {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: auto;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  width: fit-content;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme code */
+.workhub-page.dark-theme .task-card-code {
+  background: rgba(147, 112, 219, 0.2);
+  color: rgba(147, 112, 219, 0.9);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+}
+
+/* Light theme code */
+.workhub-page.light-theme .task-card-code {
+  background: rgba(1, 113, 226, 0.1);
+  color: #0171E2;
+  border: 1px solid rgba(1, 113, 226, 0.2);
+}
+
+/* Task Card Footer */
+.task-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+/* Task Completed Badge */
+.task-completed-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme completed badge */
+.workhub-page.dark-theme .task-completed-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgba(34, 197, 94, 0.9);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Light theme completed badge */
+.workhub-page.light-theme .task-completed-badge {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Empty Tasks Message */
+.empty-tasks-message {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem;
+  opacity: 0.7;
+}
+
+.empty-tasks-message h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.empty-tasks-message p {
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme empty message */
+.workhub-page.dark-theme .empty-tasks-message svg {
+  color: rgba(147, 112, 219, 0.6);
+}
+
+.workhub-page.dark-theme .empty-tasks-message h3 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.workhub-page.dark-theme .empty-tasks-message p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme empty message */
+.workhub-page.light-theme .empty-tasks-message svg {
+  color: rgba(1, 113, 226, 0.6);
+}
+
+.workhub-page.light-theme .empty-tasks-message h3 {
+  color: #1a202c;
+}
+
+.workhub-page.light-theme .empty-tasks-message p {
+  color: #4a5568;
+}
+
+/* Project Table Container */
+.project-table-container {
+  width: 100%;
+  height: 400px;
+  overflow-x: auto;
+  overflow-y: auto;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dark theme project table container */
+.workhub-page.dark-theme .project-table-container {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.2),
+    0 0 100px rgba(88, 51, 139, 0.1);
+  scrollbar-color: rgba(147, 112, 219, 0.7) rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme project table container */
+.workhub-page.light-theme .project-table-container {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.05);
+  scrollbar-color: rgba(1, 113, 226, 0.5) rgba(212, 235, 246, 0.2);
+}
+
+.project-table-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.project-table-container::-webkit-scrollbar-track {
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme scrollbar track */
+.workhub-page.dark-theme .project-table-container::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(26, 11, 46, 0.4) 50%, 
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Light theme scrollbar track */
+.workhub-page.light-theme .project-table-container::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.05) 0%, 
+    rgba(0, 0, 0, 0.08) 50%, 
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.project-table-container::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Dark theme scrollbar thumb */
+.workhub-page.dark-theme .project-table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 0.8) 0%, 
+    rgba(186, 156, 255, 0.9) 50%, 
+    rgba(147, 112, 219, 0.8) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.3);
+  box-shadow: 
+    0 2px 8px rgba(147, 112, 219, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Light theme scrollbar thumb */
+.workhub-page.light-theme .project-table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(0, 0, 0, 0.4) 50%, 
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.project-table-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.8rem;
+  background: transparent;
+  min-width: 2500px;
+  margin: 0 auto;
+}
+
+.project-table thead th {
+  font-weight: 600;
+  font-family: 'Google Sans', 'Google Sans Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-align: left;
+  padding: 1rem 0.5rem;
+  font-size: 0.7rem;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.2;
+  vertical-align: middle;
+  text-align: center;
+  height: auto;
+  min-height: 70px;
+  min-width: 100px;
+  max-width: 120px;
+  display: table-cell;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  position: relative;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+}
+
+/* Dark theme table header */
+.workhub-page.dark-theme .project-table thead th {
+  background: linear-gradient(180deg, 
+    rgba(30, 30, 40, 0.98) 0%, 
+    rgba(20, 20, 30, 0.95) 100%
+  );
+  color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(60, 60, 80, 0.8);
+  border-right: 1px solid rgba(60, 60, 80, 0.4);
+  border-top: 1px solid rgba(80, 80, 100, 0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Light theme table header */
+.workhub-page.light-theme .project-table thead th {
+  background: linear-gradient(180deg, 
+    rgba(248, 250, 252, 0.98) 0%, 
+    rgba(241, 245, 249, 0.95) 100%
+  );
+  color: #1a202c;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  text-shadow: none;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.project-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+/* Dark theme table rows */
+.workhub-page.dark-theme .project-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Light theme table rows */
+.workhub-page.light-theme .project-table tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Dark theme table rows hover */
+.workhub-page.dark-theme .project-table tbody tr:hover {
+  background: rgba(147, 112, 219, 0.1) !important;
+}
+
+/* Light theme table rows hover */
+.workhub-page.light-theme .project-table tbody tr:hover {
+  background: rgba(1, 113, 226, 0.05) !important;
+}
+
+.project-table td {
+  padding: 0.5rem 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  background: transparent;
+  vertical-align: middle;
+  transition: all 0.3s ease;
+  min-height: 40px;
+  height: auto;
+}
+
+/* Dark theme table cells */
+.workhub-page.dark-theme .project-table td {
+  color: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Light theme table cells */
+.workhub-page.light-theme .project-table td {
+  color: #2d3748;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.project-input {
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  transition: all 0.2s;
+  min-width: 100px;
+  cursor: pointer;
+  min-height: 28px;
+  height: auto;
+}
+
+/* Dark theme project input */
+.workhub-page.dark-theme .project-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.workhub-page.dark-theme .project-input:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(147, 112, 219, 0.2);
+}
+
+.workhub-page.dark-theme .project-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(147, 112, 219, 0.5);
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.2), 
+    0 0 0 2px rgba(147, 112, 219, 0.3);
+}
+
+/* Light theme project input */
+.workhub-page.light-theme .project-input {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #1a202c;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.workhub-page.light-theme .project-input:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(1, 113, 226, 0.15);
+}
+
+.workhub-page.light-theme .project-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(1, 113, 226, 0.5);
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.05), 
+    0 0 0 2px rgba(1, 113, 226, 0.3);
+}
+
+.project-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-height: 32px;
+  min-width: 32px;
+  border-radius: 4px;
+}
+
+/* Dark theme update button */
+.workhub-page.dark-theme .update-btn {
+  color: rgba(59, 130, 246, 0.8);
+}
+
+.workhub-page.dark-theme .update-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: rgba(59, 130, 246, 1);
+  transform: scale(1.1);
+}
+
+/* Light theme update button */
+.workhub-page.light-theme .update-btn {
+  color: #3b82f6;
+}
+
+.workhub-page.light-theme .update-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  transform: scale(1.1);
+}
+
+/* Dark theme upload button */
+.workhub-page.dark-theme .upload-btn {
+  color: rgba(34, 197, 94, 0.8);
+}
+
+.workhub-page.dark-theme .upload-btn:hover {
+  background: rgba(34, 197, 94, 0.1);
+  color: rgba(34, 197, 94, 1);
+  transform: scale(1.1);
+}
+
+/* Light theme upload button */
+.workhub-page.light-theme .upload-btn {
+  color: #22c55e;
+}
+
+.workhub-page.light-theme .upload-btn:hover {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  transform: scale(1.1);
+}
+
+/* Empty Project Message */
+.empty-project-message {
+  text-align: center;
+  padding: 0;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  vertical-align: middle;
+}
+
+.empty-project-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  padding: 0;
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Dark theme empty project message */
+.workhub-page.dark-theme .empty-project-content svg {
+  color: rgba(147, 112, 219, 0.6);
+  margin-bottom: 1.25rem;
+}
+
+.workhub-page.dark-theme .empty-project-content h3 {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.workhub-page.dark-theme .empty-project-content p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin: 0;
+  max-width: 220px;
+}
+
+/* Light theme empty project message */
+.workhub-page.light-theme .empty-project-content svg {
+  color: rgba(1, 113, 226, 0.6);
+  margin-bottom: 1.25rem;
+}
+
+.workhub-page.light-theme .empty-project-content h3 {
+  color: #1a202c;
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.workhub-page.light-theme .empty-project-content p {
+  color: #4a5568;
+  font-size: 0.85rem;
+  margin: 0;
+  max-width: 220px;
+}
+
+/* Logout Button */
+.logout-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+/* Dark theme logout button */
+.workhub-page.dark-theme .logout-button {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.workhub-page.dark-theme .logout-button:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+}
+
+/* Light theme logout button */
+.workhub-page.light-theme .logout-button {
+  background: rgba(253, 253, 254, 0.95);
+  color: #0171E2;
+  border: 2px solid #0171E2;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.workhub-page.light-theme .logout-button:hover {
+  background: rgba(253, 253, 254, 1);
+  color: #005bb5;
+  border-color: #005bb5;
+  transform: translateY(-1px);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(1, 113, 226, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .task-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .time-categories {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .time-category {
+    min-width: calc(33.33% - 0.5rem);
+    flex: 0 0 calc(33.33% - 0.5rem);
+  }
+  
+  .task-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-rows: repeat(4, 1fr);
+  }
+  
+  .workhub-header {
+    padding: 1rem;
+  }
+  
+  .workhub-title {
+    font-size: 2rem;
+  }
+  
+  .header-right {
+    right: 1rem;
+  }
+  
+  .workhub-breadcrumb-container {
+    left: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-category {
+    min-width: calc(50% - 0.25rem);
+    flex: 0 0 calc(50% - 0.25rem);
+  }
+  
+  .task-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  }
+  
+  .tab-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    width: 100px;
+  }
+  
+  .workhub-content {
+    padding: 0 1rem 1rem 1rem;
+  }
+}
