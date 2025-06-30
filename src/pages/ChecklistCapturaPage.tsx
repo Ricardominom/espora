@@ -629,7 +629,7 @@ const ChecklistCapturaPage: React.FC = () => {
           <div 
             ref={tableMainContainerRef}
             className="table-main-container"
-            onScroll={(e) => {
+            onScroll={(e: React.UIEvent<HTMLDivElement>) => {
               // Sincronizar el scroll horizontal con la barra superior
               if (horizontalScrollRef.current) {
                 horizontalScrollRef.current.scrollLeft = e.currentTarget.scrollLeft;
@@ -639,11 +639,11 @@ const ChecklistCapturaPage: React.FC = () => {
             <table className="checklist-table">
               <thead>
                 <tr>
-                  <th>✓</th>
-                  <th>Eliminar</th>
-                  <th>Código</th>
-                  <th>Concepto</th> 
-                  <th>Perfil</th>
+                  <th style={{ position: 'sticky', left: 0, zIndex: 20 }}>✓</th>
+                  <th style={{ position: 'sticky', left: 40, zIndex: 20 }}>Eliminar</th>
+                  <th style={{ position: 'sticky', left: 90, zIndex: 20 }}>Código</th>
+                  <th style={{ position: 'sticky', left: 150, zIndex: 20 }}>Concepto</th> 
+                  <th style={{ position: 'sticky', left: 350, zIndex: 20 }}>Perfil</th>
                   <th>Tipo</th>
                   <th>Fecha de entrega</th>
                   <th>Kpi</th>
@@ -683,7 +683,7 @@ const ChecklistCapturaPage: React.FC = () => {
                     </tr>
                     {items.map((item) => (
                       <tr key={item.id} className={item.completed ? 'completed' : ''}>
-                        <td className="checkbox-cell">
+                        <td className="checkbox-cell" style={{ position: 'sticky', left: 0, zIndex: 10 }}>
                           <button
                             className="checkbox-button"
                             onClick={() => toggleItemCompletion(item.id)}
@@ -695,7 +695,7 @@ const ChecklistCapturaPage: React.FC = () => {
                             )}
                           </button>
                         </td>
-                        <td className="delete-cell">
+                        <td className="delete-cell" style={{ position: 'sticky', left: 40, zIndex: 10 }}>
                           <button
                             className="delete-button"
                             onClick={() => handleDeleteItem(item.id)}
@@ -704,9 +704,9 @@ const ChecklistCapturaPage: React.FC = () => {
                             <Trash2 size={18} className="delete-icon" />
                           </button>
                         </td>
-                        <td className="checklist-item-id">{item.id}</td>
-                        <td className="task-cell" style={{ minWidth: "200px", maxWidth: "200px" }}>{item.concept}</td>
-                        <td>
+                        <td className="checklist-item-id" style={{ position: 'sticky', left: 90, zIndex: 10 }}>{item.id}</td>
+                        <td className="task-cell" style={{ minWidth: "200px", maxWidth: "200px", position: 'sticky', left: 150, zIndex: 10 }}>{item.concept}</td>
+                        <td style={{ position: 'sticky', left: 350, zIndex: 10 }}>
                           <select
                             className="table-input"
                             value={getFieldValue(item.id, 'assignedUser') || ''}

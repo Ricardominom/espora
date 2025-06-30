@@ -2,7 +2,7 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden; 
-  overflow-y: scroll; /* Scroll vertical para toda la página */
+  overflow-y: auto; /* Auto scroll vertical para toda la página */
   display: flex;
   flex-direction: column;
   padding: 0.3rem;
@@ -502,7 +502,7 @@
   width: 100%;
   height: fit-content; /* Altura automática basada en contenido */
   min-height: 400px; 
-  overflow-y: scroll;
+  overflow-y: auto;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -750,7 +750,7 @@
   height: fit-content; /* Altura automática */
   min-height: 300px;
   max-height: none;
-  overflow-y: visible; /* Mantener visible para que el scroll principal funcione */
+  overflow-y: auto; /* Permitir scroll vertical */
   overflow-x: auto;
   scrollbar-width: thin;
   padding: 0 0.575rem; /* Padding lateral aumentado 15% */
@@ -865,9 +865,10 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.8rem; 
-  background: transparent;
+  background: transparent; 
   min-width: 4000px; /* Ancho aumentado para mostrar todas las columnas completamente */
   margin: 0 auto; /* Centrar la tabla */
+  position: relative;
 }
 
 .checklist-table thead th {
@@ -877,7 +878,7 @@
   padding: 1rem 0.5rem;
   font-size: 0.7rem;
   position: sticky;
-  top: 0;
+  top: 0; 
   z-index: 15;
   white-space: normal;
   word-wrap: break-word;
@@ -1167,6 +1168,7 @@
   transition: all 0.3s ease;
   min-height: 40px;
   height: auto;
+  position: relative;
 }
 
 /* Dark theme table cells */
@@ -1546,7 +1548,8 @@
   .checklist-content {
     height: calc(100vh - 100px);
     max-height: calc(100vh - 100px);
-    padding: 0.5rem 1rem 6rem 1rem;
+    padding: 0.5rem 1rem 8rem 1rem;
+    overflow-y: visible;
   }
   
   .form-step-content {
@@ -1569,5 +1572,15 @@
   
   .checklist-table {
     font-size: 0.65rem;
+  }
+  
+  .checklist-table-container {
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+  
+  .table-main-container {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
   }
 }
