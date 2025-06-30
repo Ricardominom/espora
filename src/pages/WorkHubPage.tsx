@@ -883,3 +883,34 @@ const WorkHubPage: React.FC = () => {
       </div>
 
       
+
+      {/* Modals */}
+      <InputModal
+        isOpen={modalState.isOpen}
+        onClose={closeModal}
+        fieldName={modalState.fieldName}
+        fieldType={modalState.fieldType}
+        initialValue={modalState.initialValue}
+        selectOptions={modalState.selectOptions}
+        onSave={modalState.onSave}
+      />
+
+      <SelectAccountModalForWorkHub
+        isOpen={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        onSelectAccount={handleSelectAccount}
+      />
+
+      <LogoutDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={() => {
+          useAuthStore.getState().logout();
+          navigate('/login');
+        }}
+      />
+    </div>
+  );
+};
+
+export default WorkHubPage;
