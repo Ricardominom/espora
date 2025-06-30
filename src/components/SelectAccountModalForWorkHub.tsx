@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Users, CheckCircle } from 'lucide-react';
 import '../styles/modal.css';
 
+
 interface Account {
   id: number;
   name: string;
@@ -25,11 +26,10 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>(currentAccountId?.toString() || "");
 
+  // Reset selected account when modal opens or currentAccountId changes
   useEffect(() => {
-    // Fetch active accounts
-    const fetchAccounts = () => {
-      // In a real app, this would be an API call
-      // For now, we'll use mock data
+    if (isOpen) {
+      // Fetch active accounts
       const mockAccounts: Account[] = [
         { id: 1, name: 'Juan Pérez', position: 'Alcalde', isActive: true },
         { id: 2, name: 'María García', position: 'Gobernadora', isActive: true },
@@ -40,13 +40,11 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
       // Filter only active accounts
       const activeAccounts = mockAccounts.filter(account => account.isActive);
       setAccounts(activeAccounts);
-    };
-    
-    if (isOpen) {
-      fetchAccounts();
-      setSelectedAccountId(currentAccountId?.toString() || "");
+      
+      // Reset selected account ID
+      setSelectedAccountId(currentAccountId ? currentAccountId.toString() : "");
     }
-  }, [isOpen]);
+  }, [isOpen, currentAccountId]);
 
   if (!isOpen) return null;
 
@@ -104,7 +102,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
               ))}
             </select>
           </div>
-
+          
           <div className="modal-footer">
             <button type="button" onClick={onClose} className="cancel-button">
               Cancelar

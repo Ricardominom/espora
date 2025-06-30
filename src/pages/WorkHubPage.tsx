@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
@@ -44,7 +43,7 @@ const WorkHubPage: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<ProjectItem[]>([]);
+  const [filteredProjectItems, setFilteredProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
   const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
   const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
@@ -112,62 +111,54 @@ const WorkHubPage: React.FC = () => {
   // Effect to filter project items based on selected account
   useEffect(() => {
     if (!selectedAccount) {
-      setFilteredItems([]);
+      setFilteredProjectItems([]);
       return;
     }
 
-    // Get client name from selected account
-    const clientName = selectedAccount.name.split(' - ')[0];
-    
-    // Filter project items for this specific client
-    // In a real app, this would be a server call to get client-specific data
-    // For now, we'll simulate filtering by showing a subset of items
-    const filtered = projectItems.filter((item, index) => {
-      // This is a simple filter for demonstration
-      // In a real app, you would have a proper client ID to filter by
-      if (selectedAccount.id === 1) {
-        // For Juan Pérez, show items with IDs starting with A-1
-        return item.id.startsWith('A-1');
-      } else if (selectedAccount.id === 2) {
-        // For María García, show items with IDs starting with A-2
-        return item.id.startsWith('A-2');
-      } else if (selectedAccount.id === 4) {
-        // For Ana Martínez, show items with IDs starting with A-4
-        return item.id.startsWith('A-4');
-      } else if (selectedAccount.id === 6) {
-        // For Laura Hernández, show items with IDs starting with A-5
-        return item.id.startsWith('A-5');
-      }
-      
-      // Default: show no items for other accounts
-      return false;
-    });
-    
-    setFilteredItems(filtered);
-  }, [selectedAccount, projectItems]);
+    setIsLoading(true);
 
-  // Combine project items and task assignments for the project tab
-  useEffect(() => {
-    // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...filteredItems]; 
-    
-    // Add task assignments that aren't already in project items
-    taskAssignments.forEach(task => {
-      // Check if this task is already in project items
-      const existingItem = filteredItems.find(item => item.id === task.itemId);
+    // Simulate loading data for the selected account
+    setTimeout(() => {
+      // Filter project items based on account ID
+      let filtered: ProjectItem[] = [];
       
-      // If not found and it's a valid task with an itemId, add it
-      if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
-        combined.push({
-          id: task.itemId,
-          concept: task.concept || "Tarea sin nombre",
-          section: task.section || "Sin sección",
-          sectionId: task.sectionId || "",
-          completed: task.completed || false,
-          isTaskAssignment: true
-        });
+      // This is a simple filter for demonstration
+      // In a real app, you would fetch data from the server for this specific account
+      switch (selectedAccount.id) {
+        case 1: // Juan Pérez
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-1') || item.id.startsWith('A-101'));
+          break;
+        case 2: // María García
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-2') || item.id.startsWith('A-102'));
+          break;
+        case 4: // Ana Martínez
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-4') || item.id.startsWith('A-104'));
+          break;
+        case 6: // Laura Hernández
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-5') || item.id.startsWith('A-105'));
+          break;
+        default:
+          filtered = [];
       }
-    });
+      
+      setFilteredProjectItems(filtered);
+      setIsLoading(false);
+    }, 800); // Simulate network delay
+  }, [selectedAccount, projectItems]); 
+
+  // Group filtered items by section
+  useEffect(() => {
+    if (!filteredProjectItems.length) {
+      setGroupedItems({});
+      return;
+    }
+
+    // Create a combined list of filtered project items
+    const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems];
     
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
@@ -196,7 +187,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [filteredItems, taskAssignments, selectedAccount]);
+  }, [filteredProjectItems]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
@@ -205,7 +196,7 @@ const WorkHubPage: React.FC = () => {
       let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData');
       
-      if (formData) {
+      if (formData && Object.keys(formData).length > 0) {
         const items: ProjectItem[] = [];
         
         // Procesar cada sección
@@ -217,7 +208,8 @@ const WorkHubPage: React.FC = () => {
                 id: item.id,
                 concept: item.concept,
                 section: getSectionName(sectionId),
-                sectionId: sectionId
+                sectionId: sectionId,
+                completed: false
               });
             }
           });
@@ -225,6 +217,13 @@ const WorkHubPage: React.FC = () => {
         
         setProjectItems(items);
       }
+      
+      // Load completed items status
+      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
+      setProjectItems(prevItems => prevItems.map(item => ({
+        ...item,
+        completed: completedItems[item.id] || false
+      })));
     } catch (error) {
       console.error('Error loading project items:', error);
     }
@@ -433,8 +432,8 @@ const WorkHubPage: React.FC = () => {
     // Guardar la cuenta seleccionada en localStorage
     storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
     
-    // Clear any existing filtered items
-    setFilteredItems([]);
+    // Reset filtered items and grouped items
+    setFilteredProjectItems([]);
     
     setIsLoading(true);
     
@@ -634,6 +633,7 @@ const WorkHubPage: React.FC = () => {
                                 <td className="item-code-cell">
                                   <div className="item-code">{item.id}</div>
                                   <div className="item-concept-cell">{item.concept}</div>
+                                </td>
                                 </td>
                                 <td>
                                   <button className="project-action-btn upload-btn">
@@ -888,15 +888,18 @@ const WorkHubPage: React.FC = () => {
                     ) : (
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
-                          <div className="empty-project-content">
-                            <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                            <h3>{!selectedAccount ? 'Selecciona una cuenta' : 
-                                 isLoading ? 'Cargando datos...' : 
-                                 'No hay ítems para esta cuenta'}</h3>
-                            <p>{!selectedAccount ? 'Haz clic en "Seleccionar cuenta" para ver los proyectos' : 
-                                isLoading ? 'Espera mientras cargamos la información' : 
-                                'Esta cuenta no tiene ítems en el acuerdo de colaboración'}</p>
-                          </div> 
+                          {isLoading ? (
+                            <div className="project-loading-state">
+                              <div className="loading-spinner"></div>
+                              <p>Cargando datos de la cuenta...</p>
+                            </div>
+                          ) : (
+                            <div className="empty-project-content">
+                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                              <h3>{!selectedAccount ? 'Selecciona una cuenta' : 'No hay ítems para esta cuenta'}</h3>
+                              <p>{!selectedAccount ? 'Haz clic en "Seleccionar cuenta" para ver los proyectos' : 'Esta cuenta no tiene ítems en el acuerdo de colaboración'}</p>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     )}
