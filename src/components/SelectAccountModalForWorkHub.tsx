@@ -12,7 +12,7 @@ interface SelectAccountModalForWorkHubProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectAccount: (accountId: number, accountName: string) => void;
-  currentAccountId?: number;
+  currentAccountId?: number | null;
 }
 
 const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> = ({ 
@@ -24,6 +24,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>(currentAccountId?.toString() || "");
 
+  // Reset selected account when modal opens
   useEffect(() => {
     // Fetch active accounts
     const fetchAccounts = () => {
@@ -43,7 +44,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
     
     if (isOpen) {
       fetchAccounts();
-      setSelectedAccountId(currentAccountId?.toString() || "");
+      setSelectedAccountId(currentAccountId ? currentAccountId.toString() : "");
     }
   }, [isOpen]);
 

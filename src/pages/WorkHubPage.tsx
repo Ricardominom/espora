@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
@@ -45,8 +44,9 @@ const WorkHubPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
-  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
-  const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
+  const [filteredProjectItems, setFilteredProjectItems] = useState<ProjectItem[]>([]);
+  const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({});
   const [sectionOrder, setSectionOrder] = useState<string[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
     // Intentar cargar los valores de los campos desde localStorage
@@ -108,29 +108,57 @@ const WorkHubPage: React.FC = () => {
     loadProjectItems();
   }, [user]);
 
-  // Combine project items and task assignments for the project tab
+  // Effect to filter project items based on selected account
   useEffect(() => {
-    // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems]; 
-    
-    // Add task assignments that aren't already in project items
-    taskAssignments.forEach(task => {
-      // Check if this task is already in project items
-      const existingItem = projectItems.find(item => item.id === task.itemId);
+    if (!selectedAccount) {
+      setFilteredProjectItems([]);
+      return;
+    }
+
+    // Get client name from selected account
+    const clientName = selectedAccount.name.split(' - ')[0];
+
+    // Load client-specific data from localStorage
+    const clientData = storage.getItem<{
+      selectedItems: {[key: string]: boolean},
+      formData: {[key: string]: any[]},
+      completedItems: {[key: string]: boolean}
+    }>(`client_${clientName}_data`);
+
+    if (clientData) {
+      // Use client-specific data if available
+      const items: ProjectItem[] = [];
       
-      // If not found and it's a valid task with an itemId, add it
-      if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
-        combined.push({
-          id: task.itemId,
-          concept: task.concept || "Tarea sin nombre",
-          section: task.section || "Sin sección",
-          sectionId: task.sectionId || "",
-          completed: task.completed || false,
-          isTaskAssignment: true
+      if (clientData.formData) {
+        Object.entries(clientData.formData).forEach(([sectionId, data]: [string, any[]]) => {
+          data.forEach((item) => {
+            if (clientData.selectedItems && clientData.selectedItems[item.id]) {
+              items.push({
+                id: item.id,
+                concept: item.concept,
+                section: getSectionName(sectionId),
+                sectionId: sectionId,
+                completed: clientData.completedItems ? clientData.completedItems[item.id] : false
+              });
+            }
+          });
         });
       }
-    });
-    
+      
+      setFilteredProjectItems(items);
+    } else {
+      // Filter project items based on the selected account
+      // This is a fallback if client-specific data isn't available
+      // In a real app, you would fetch data for the specific account from the server
+      setFilteredProjectItems([]);
+    }
+  }, [selectedAccount]);
+
+  // Combine filtered project items and task assignments for the project tab
+  useEffect(() => {
+    // Create a combined list of filtered project items and task assignments
+    const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems];
+
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
     
@@ -158,7 +186,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [projectItems, taskAssignments]);
+  }, [filteredProjectItems]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
@@ -166,7 +194,7 @@ const WorkHubPage: React.FC = () => {
       // Cargar los ítems seleccionados y los datos del formulario
       let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData');
-      
+      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
       if (formData) {
         const items: ProjectItem[] = [];
         
@@ -179,7 +207,8 @@ const WorkHubPage: React.FC = () => {
                 id: item.id,
                 concept: item.concept,
                 section: getSectionName(sectionId),
-                sectionId: sectionId
+                sectionId: sectionId,
+                completed: completedItems[item.id] || false
               });
             }
           });
@@ -187,6 +216,18 @@ const WorkHubPage: React.FC = () => {
         
         setProjectItems(items);
       }
+      
+      // Store data for each client separately
+      // This allows us to filter by client later
+      const clientsData = storage.getItem<string[]>('clientsList') || [];
+      
+      clientsData.forEach(clientName => {
+        storage.setItem(`client_${clientName}_data`, {
+          selectedItems,
+          formData,
+          completedItems
+        });
+      });
     } catch (error) {
       console.error('Error loading project items:', error);
     }
@@ -394,6 +435,17 @@ const WorkHubPage: React.FC = () => {
     
     // Guardar la cuenta seleccionada en localStorage
     storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
+
+    // Extract client name from account name
+    const clientName = accountName.split(' - ')[0];
+    
+    // Add to clients list if not already there
+    const clientsList = storage.getItem<string[]>('clientsList') || [];
+    if (!clientsList.includes(clientName)) {
+      clientsList.push(clientName);
+      storage.setItem('clientsList', clientsList);
+    }
+    
     
     setIsLoading(true);
     
@@ -401,7 +453,7 @@ const WorkHubPage: React.FC = () => {
     setTimeout(() => {
       // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
       setIsLoading(false);
-    }, 1500);
+    }, 800);
   };
 
   return (
