@@ -202,8 +202,7 @@ const ChecklistCapturaPage: React.FC = () => {
             concept: item.concept,
             section: sectionName,
             sectionId,
-            completed: savedCompletedItems[item.id] || completedFromAssignments[item.id] || false,
-            completed: false
+            completed: savedCompletedItems[item.id] || completedFromAssignments[item.id] || false
           });
         }
       });
@@ -264,7 +263,10 @@ const ChecklistCapturaPage: React.FC = () => {
     );
     
     setChecklistItems(updatedItems);
-    setCompletedItems(prev => ({...prev, [itemId]: !prev[itemId]}));
+    
+    // Actualizar el estado de completado
+    const newCompletedState = !completedItems[itemId];
+    setCompletedItems(prev => ({...prev, [itemId]: newCompletedState}));
     
     // Guardar el estado de completado en localStorage
     const completedItemsMap = updatedItems.reduce((acc, item) => {
@@ -276,12 +278,13 @@ const ChecklistCapturaPage: React.FC = () => {
     
     // Update task assignments if this item is assigned to someone
     const assignedUserId = getFieldValue(itemId, 'assignedUser');
+    
+    // Obtener el nuevo estado de completado
+    const isCompleted = updatedItems.find(i => i.id === itemId)?.completed || false;
+    
     if (assignedUserId) {
       const item = checklistItems.find(item => item.id === itemId);
       if (item) {
-        // Obtener el nuevo estado de completado
-        const isCompleted = updatedItems.find(i => i.id === itemId)?.completed || false;
-        
         // Buscar si ya existe una asignación para este item
         // Si existe, actualizar el estado de completado
         const assignmentIndex = taskAssignments.findIndex(a => a.itemId === itemId);
@@ -304,7 +307,6 @@ const ChecklistCapturaPage: React.FC = () => {
             userId: assignedUserId,
             concept: item.concept,
             section: item.section || getSectionName(item.sectionId),
-            sectionId: item.sectionId,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',
             completed: isCompleted
@@ -348,7 +350,7 @@ const ChecklistCapturaPage: React.FC = () => {
     if (!itemToDelete) return;
     
     setChecklistItems(prev => prev.filter(item => item.id !== itemToDelete));
-
+    
     // Eliminar el item de las asignaciones de tareas
     const updatedAssignments = taskAssignments.filter(assignment => assignment.itemId !== itemToDelete);
     setTaskAssignments(updatedAssignments);
@@ -548,7 +550,13 @@ const ChecklistCapturaPage: React.FC = () => {
   // Efecto para guardar las asignaciones de tareas cuando cambian
   useEffect(() => {
     console.log("Saving task assignments:", taskAssignments.length);
-    storage.setItem('taskAssignments', taskAssignments);
+    
+    // Asegurarse de que solo guardamos asignaciones válidas
+    const validAssignments = taskAssignments.filter(assignment => 
+      assignment.itemId && assignment.userId && assignment.concept
+    );
+    
+    storage.setItem('taskAssignments', validAssignments);
     
     // También guardar el estado de completado de los items
     const completedItemsMap = checklistItems.reduce((acc, item) => {
@@ -556,7 +564,22 @@ const ChecklistCapturaPage: React.FC = () => {
       return acc;
     }, {} as {[key: string]: boolean});
     
-    storage.setItem('completedItems', {...completedItems, ...completedItemsMap});
+    // Combinar el estado actual con el nuevo
+    const combinedCompletedItems = {...completedItems, ...completedItemsMap};
+    storage.setItem('completedItems', combinedCompletedItems);
+    
+    // Actualizar también el estado completado en las asignaciones
+    const updatedAssignments = taskAssignments.map(assignment => {
+      const isCompleted = combinedCompletedItems[assignment.itemId] || false;
+      return {
+        ...assignment,
+        completed: isCompleted
+      };
+    });
+    
+    if (JSON.stringify(updatedAssignments) !== JSON.stringify(taskAssignments)) {
+      setTaskAssignments(updatedAssignments);
+    }
   }, [taskAssignments]);
 
   // Opciones para los selects
