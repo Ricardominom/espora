@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Users, CheckCircle } from 'lucide-react';
 import '../styles/modal.css';
-
 interface Account {
   id: number;
   name: string;
@@ -103,19 +102,6 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
                 </option>
               ))}
             </select>
-          </div>
-          
-          <div className="form-group" style={{ gridColumn: 'span 2' }}>
-            <label>Cuentas disponibles</label>
-            <div className="accounts-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
-              {accounts.map(account => (
-                <button key={account.id} onClick={() => setSelectedAccountId(account.id.toString())} style={{ 
-                  padding: '0.75rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid rgba(0,0,0,0.1)', background: account.id === parseInt(selectedAccountId) ? 'rgba(59, 130, 246, 0.1)' : 'transparent' 
-                }}>
-                  {account.name} - {account.position} {account.id === currentAccountId && <CheckCircle size={16} style={{ display: 'inline', marginLeft: '0.5rem', color: 'green' }}/>}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="modal-footer">
