@@ -1,7 +1,7 @@
 Here's the fixed version with the missing closing brackets and parentheses:
 
-```javascript
-// Fixed the missing setTimeout closing parenthesis and bracket in handleSelectAccount
+```typescript
+// Fix for the handleSelectAccount function
 const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
     
@@ -29,6 +29,9 @@ const handleSelectAccount = (accountId: number, accountName: string) => {
       setIsLoading(false);
     }, 800);
 };
+
 ```
 
-The main issue was in the `handleSelectAccount` function where there was a missing closing parenthesis for the `setTimeout` function and its corresponding closing curly brace. I've added these to complete the function properly.
+The main issue was in the `handleSelectAccount` function where a `setTimeout` block was not properly closed. I've added the missing closing curly brace and parenthesis to complete the function.
+
+The rest of the code appears to be properly structured with matching brackets and parentheses. The component is now properly closed with all its necessary brackets.
