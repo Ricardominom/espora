@@ -501,8 +501,8 @@
 .checklist-table-container {
   width: 100%;
   height: fit-content; /* Altura automática basada en contenido */
-  min-height: 400px;
-  overflow: visible;
+  min-height: 400px; 
+  overflow-y: scroll;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -511,11 +511,105 @@
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  scrollbar-width: none;
+  scrollbar-width: thin;
   margin-bottom: 2rem; /* Margen normal en el contenedor de la tabla */
   padding: 0.575rem; /* Padding aumentado 15% */
   /* Asegurar que el contenedor mantenga transparencia */
   background-color: transparent !important;
+}
+
+/* Estilos para la barra de scroll vertical de la tabla */
+.checklist-table-container::-webkit-scrollbar {
+  width: 14px;
+  display: block;
+}
+
+.checklist-table-container::-webkit-scrollbar-track {
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme table scrollbar track */
+.checklist-captura-page.dark-theme .checklist-table-container::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(26, 11, 46, 0.4) 50%, 
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Light theme table scrollbar track */
+.checklist-captura-page.light-theme .checklist-table-container::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.05) 0%, 
+    rgba(0, 0, 0, 0.08) 50%, 
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.checklist-table-container::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  min-height: 40px;
+}
+
+/* Dark theme table scrollbar thumb */
+.checklist-captura-page.dark-theme .checklist-table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 0.8) 0%, 
+    rgba(186, 156, 255, 0.9) 50%, 
+    rgba(147, 112, 219, 0.8) 100%
+  );
+  border: 1px solid rgba(147, 112, 219, 0.3);
+  box-shadow: 
+    0 2px 8px rgba(147, 112, 219, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Light theme table scrollbar thumb */
+.checklist-captura-page.light-theme .checklist-table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(0, 0, 0, 0.4) 50%, 
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Dark theme table scrollbar hover */
+.checklist-captura-page.dark-theme .checklist-table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, 
+    rgba(147, 112, 219, 1) 0%, 
+    rgba(186, 156, 255, 1) 50%, 
+    rgba(147, 112, 219, 1) 100%
+  );
+  box-shadow: 
+    0 4px 16px rgba(147, 112, 219, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  border-color: rgba(147, 112, 219, 0.5);
+}
+
+/* Light theme table scrollbar hover */
+.checklist-captura-page.light-theme .checklist-table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.4) 0%, 
+    rgba(0, 0, 0, 0.5) 50%, 
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+  border-color: rgba(0, 0, 0, 0.3);
 }
 
 /* Contenedor para el scroll horizontal arriba */
@@ -656,7 +750,7 @@
   height: fit-content; /* Altura automática */
   min-height: 300px;
   max-height: none;
-  overflow-y: visible;
+  overflow-y: visible; /* Mantener visible para que el scroll principal funcione */
   overflow-x: auto;
   scrollbar-width: thin;
   padding: 0 0.575rem; /* Padding lateral aumentado 15% */
