@@ -444,7 +444,7 @@ const WorkHubPage: React.FC = () => {
         </div>
         
         <h1 className="workhub-title">
-          WORKHUB {selectedAccount && activeTab === 'proyecto' && <AccountBadge accountName={selectedAccount.name} />}
+          Mi workhub {selectedAccount && activeTab === 'proyecto' && <AccountBadge accountName={selectedAccount.name} />}
         </h1>
         
         <div className="header-right">
