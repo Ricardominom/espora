@@ -569,7 +569,7 @@ const WorkHubPage: React.FC = () => {
               </div>
             ) : (
               <div className="project-table-wrapper">
-                <table className="project-table">
+                <table className="project-table" style={{ tableLayout: 'fixed' }}>
                   <thead>
                     <tr>
                       <th>Item</th>
@@ -872,7 +872,7 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                           {!selectedAccount && (
-                            <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem' }}>
+                            <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem', maxWidth: '400px' }}>
                               <Briefcase size={48} style={{ marginBottom: '1.5rem', opacity: 0.7 }} />
                               <h3 style={{ marginBottom: '1rem' }}>
                                 Selecciona una cuenta para ver los proyectos
