@@ -850,6 +850,8 @@
 /* Light theme completed item */
 .workhub-page.light-theme .completed-item {
   background: rgba(34, 197, 94, 0.05);
+}
+
 .project-table-container::-webkit-scrollbar {
   height: 12px;
 }
