@@ -1,441 +1,962 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { useFileStore } from '../stores/fileStore';
-import { useClientStore } from '../stores/clientStore';
-import Header from '../components/Header';
 import LogoutDialog from '../components/LogoutDialog';
-import { SelectAccountModalForWorkHub } from '../components/SelectAccountModalForWorkHub';
-import FileNameEditModal from '../components/FileNameEditModal';
-import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorMessage from '../components/ErrorMessage';
-import { 
-  FolderOpen, 
-  FileText, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  Download,
-  Upload,
-  Search,
-  Filter,
-  Grid,
-  List
-} from 'lucide-react';
+import MenuBackground from '../components/MenuBackground';
+import { storage } from '../utils/storage';
+import InputModal from '../components/InputModal';
+import SelectAccountModalForWorkHub from '../components/SelectAccountModalForWorkHub';
+import AccountBadge from '../components/AccountBadge';
+import '../styles/workhub.css';
+
+interface TaskAssignment {
+  itemId: string;
+  userId: string;
+  concept: string;
+  dueDate: string;
+  section: string;
+  sectionId?: string;
+  completed?: boolean;
+  code?: string;
+}
 
 interface ProjectItem {
   id: string;
-  name: string;
-  type: 'folder' | 'file';
-  size?: number;
-  modified: Date;
-  path: string;
+  concept: string;
+  section: string;
+  sectionId: string;
+  completed?: boolean;
 }
 
 const WorkHubPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
-  const { files, loading, error, loadFiles, createFile, deleteFile, renameFile } = useFileStore();
-  const { selectedClient } = useClientStore();
-  
+  const { user } = useAuthStore();
+  const [isVisible, setIsVisible] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<'tareas' | 'proyecto'>('tareas');
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [showFileNameModal, setShowFileNameModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<ProjectItem | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filterType, setFilterType] = useState<'all' | 'folders' | 'files'>('all');
+  const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
+    // Intentar cargar la cuenta seleccionada desde localStorage
+    const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
+    return savedAccount;
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
-
+  const [filteredProjectItems, setFilteredProjectItems] = useState<ProjectItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('today');
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
+  const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
+  const [sectionOrder, setSectionOrder] = useState<string[]>([]);
+  const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
+    // Intentar cargar los valores de los campos desde localStorage
+    const savedValues = storage.getItem<{[key: string]: string}>('fieldValues');
+    return savedValues || {};
+  });
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    fieldName: '',
+    fieldType: 'text' as 'text' | 'number' | 'select',
+    initialValue: '',
+    selectOptions: [] as { value: string; label: string }[],
+    onSave: (value: string) => {}
+  });
+  const [isDarkMode, setIsDarkMode] = useState(() => 
+    document.body.classList.contains('dark-theme')
+  );
+  
+  // Listen for theme changes
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(document.body.classList.contains('dark-theme'));
+    });
     
-    if (!selectedClient) {
-      setShowAccountModal(true);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  useEffect(() => {
+    setIsVisible(true);
+
+    // Función para cargar las tareas
+    const loadTasks = () => {
+      try {
+        // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
+        let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+        
+        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+        savedAssignments = savedAssignments.filter(task => 
+          task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+        );
+        
+        // Filtrar solo las tareas asignadas al usuario actual
+        if (user) {
+          const userTasks = savedAssignments.filter(task => task.userId === user.id);
+          setTaskAssignments(userTasks);
+        }
+      } catch (error) {
+        console.error('Error loading task assignments:', error);
+      }
+    };
+    
+    // Cargar tareas inicialmente
+    loadTasks();
+    loadProjectItems();
+  }, [user]);
+
+  // Effect to filter project items based on selected account
+  useEffect(() => {
+    if (!selectedAccount) {
+      setFilteredProjectItems([]);
       return;
     }
 
-    loadProjectItems();
-  }, [user, selectedClient, navigate]);
+    setIsLoading(true);
 
-  const loadProjectItems = async () => {
+    // Simulate loading data for the selected account
+    setTimeout(() => {
+      // Filter project items based on account ID
+      let filtered: ProjectItem[] = [];
+      
+      // This is a simple filter for demonstration
+      // In a real app, you would fetch data from the server for this specific account
+      switch (selectedAccount.id) {
+        case 1: // Juan Pérez
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-1') || item.id.startsWith('A-101'));
+          break;
+        case 2: // María García
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-2') || item.id.startsWith('A-102'));
+          break;
+        case 4: // Ana Martínez
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-4') || item.id.startsWith('A-104'));
+          break;
+        case 6: // Laura Hernández
+          filtered = projectItems.filter(item => 
+            item.id.startsWith('A-5') || item.id.startsWith('A-105'));
+          break;
+        default:
+          filtered = [];
+      }
+      
+      setFilteredProjectItems(filtered);
+      setIsLoading(false);
+    }, 800); // Simulate network delay
+  }, [selectedAccount, projectItems]); 
+
+  // Group filtered items by section
+  useEffect(() => {
+    if (!filteredProjectItems.length) {
+      setGroupedItems({});
+      return;
+    }
+
+    // Create a combined list of filtered project items
+    const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems];
+    
+    // Group items by section
+    const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
+    
+    combined.forEach(item => {
+      const sectionId = item.sectionId || 'unknown';
+      const sectionName = getSectionNameFromId(sectionId);
+      
+      if (!grouped[sectionName]) {
+        grouped[sectionName] = [];
+      }
+      
+      grouped[sectionName].push(item);
+    });
+    
+    // Define the order of sections
+    const order = [
+      'Set Up Estrategia Digital',
+      'Estudios Antropológicos',
+      'Otros Estudios',
+      'Set Up Acompañamiento Digital',
+      'Set Up Gerencia Digital',
+      'Set Up Producción',
+      'Set up Difusión'
+    ];
+    
+    setGroupedItems(grouped);
+    setSectionOrder(order);
+  }, [filteredProjectItems]);
+
+  // Función para cargar los ítems del proyecto desde localStorage
+  const loadProjectItems = () => {
     try {
-      await loadFiles();
-      // Transform files to project items format
-      const items: ProjectItem[] = files.map(file => ({
-        id: file.id,
-        name: file.name,
-        type: file.type === 'folder' ? 'folder' : 'file',
-        size: file.size,
-        modified: new Date(file.lastModified),
-        path: file.path
-      }));
-      setProjectItems(items);
+      // Cargar los ítems seleccionados y los datos del formulario
+      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      const formData = storage.getItem<{[key: string]: any[]}>('formData');
+      
+      if (formData && Object.keys(formData).length > 0) {
+        const items: ProjectItem[] = [];
+        
+        // Procesar cada sección
+        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+          data.forEach((item) => {
+            // Solo incluir items reales (que comiencen con A- o B-)
+            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+              items.push({
+                id: item.id,
+                concept: item.concept,
+                section: getSectionName(sectionId),
+                sectionId: sectionId,
+                completed: false
+              });
+            }
+          });
+        });
+        
+        setProjectItems(items);
+      }
+      
+      // Load completed items status
+      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
+      setProjectItems(prevItems => prevItems.map(item => ({
+        ...item,
+        completed: completedItems[item.id] || false
+      })));
     } catch (error) {
       console.error('Error loading project items:', error);
     }
   };
 
-  const handleCreateNew = (type: 'folder' | 'file') => {
-    setSelectedItem({ 
-      id: '', 
-      name: '', 
-      type, 
-      modified: new Date(), 
-      path: '/' 
-    });
-    setShowFileNameModal(true);
-  };
-
-  const handleEdit = (item: ProjectItem) => {
-    setSelectedItem(item);
-    setShowFileNameModal(true);
-  };
-
-  const handleDelete = (item: ProjectItem) => {
-    setSelectedItem(item);
-    setShowDeleteModal(true);
-  };
-
-  const handleSaveFileName = async (name: string) => {
-    if (!selectedItem) return;
-
-    try {
-      if (selectedItem.id) {
-        // Rename existing item
-        await renameFile(selectedItem.id, name);
-      } else {
-        // Create new item
-        await createFile(name, selectedItem.type);
-      }
-      await loadProjectItems();
-      setShowFileNameModal(false);
-      setSelectedItem(null);
-    } catch (error) {
-      console.error('Error saving file:', error);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedItem) return;
-
-    try {
-      await deleteFile(selectedItem.id);
-      await loadProjectItems();
-      setShowDeleteModal(false);
-      setSelectedItem(null);
-    } catch (error) {
-      console.error('Error deleting file:', error);
-    }
-  };
-
-  const filteredItems = projectItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterType === 'all' || 
-      (filterType === 'folders' && item.type === 'folder') ||
-      (filterType === 'files' && item.type === 'file');
+  // Función para obtener el nombre de la sección
+  const getSectionName = (sectionId: string): string => {
+    const sectionMapping: {[key: string]: string} = {
+      'estrategia': 'Set Up Estrategia Digital',
+      'antropologicos': 'Estudios Antropológicos', 
+      'otros-estudios': 'Otros Estudios',
+      'acompanamiento': 'Set Up Acompañamiento Digital',
+      'gerencia': 'Set Up Gerencia Digital',
+      'produccion': 'Set Up Producción',
+      'difusion': 'Set up Difusión'
+    };
     
-    return matchesSearch && matchesFilter;
-  });
-
-  const formatFileSize = (bytes?: number) => {
-    if (!bytes) return '';
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    return sectionMapping[sectionId] || sectionId;
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+  // Función para obtener las tareas según la categoría seleccionada
+  const getFilteredTasks = () => {
+    if (!taskAssignments.length) return [];
+    
+    // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+    const realTasks = taskAssignments.filter(task => 
+      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+    );
+    
+    if (!realTasks.length) return [];
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const nextWeekStart = new Date(today);
+    nextWeekStart.setDate(today.getDate() + 7 - today.getDay());
+    
+    const nextWeekEnd = new Date(nextWeekStart);
+    nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+    
+    return taskAssignments.filter(task => {
+      // Si la categoría es "all", mostrar todas las tareas reales
+      if (selectedCategory === 'all') return true;
+      
+      if (!task.dueDate) return selectedCategory === 'no-date'; 
+      
+      const dueDate = new Date(task.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      
+      switch (selectedCategory) {
+        case 'past':
+          return dueDate < today;
+        case 'today':
+          return dueDate.getTime() === today.getTime();
+        case 'this-week':
+          const thisWeekEnd = new Date(today);
+          thisWeekEnd.setDate(today.getDate() + (6 - today.getDay()));
+          return dueDate > today && dueDate <= thisWeekEnd;
+        case 'next-week':
+          return dueDate >= nextWeekStart && dueDate <= nextWeekEnd;
+        case 'later':
+          return dueDate > nextWeekEnd;
+        case 'no-date':
+          return !task.dueDate;
+        default:
+          return true;
+      }
     });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <Header 
-          user={user}
-          onLogout={() => setShowLogoutDialog(true)}
-        />
-        <div className="flex items-center justify-center h-96">
-          <LoadingSpinner />
-        </div>
-      </div>
+  const filteredTasks = getFilteredTasks();
+
+  // Función para obtener el conteo de tareas por categoría
+  const getTaskCountForCategory = (categoryId: string) => {
+    if (!taskAssignments.length) return 0;
+    
+    // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
+    const realTasks = taskAssignments.filter(task => 
+      task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
-  }
+    
+    if (!realTasks.length) return 0;
+
+    // Si la categoría es "all", mostrar el total de tareas
+    if (categoryId === 'all') return realTasks.length;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const nextWeekStart = new Date(today);
+    nextWeekStart.setDate(today.getDate() + 7 - today.getDay());
+    
+    const nextWeekEnd = new Date(nextWeekStart);
+    nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+    
+    return taskAssignments.filter(task => {
+      if (!task.dueDate || !task.itemId || !(task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) return false;
+      
+      const dueDate = new Date(task.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      
+      switch (categoryId) {
+        case 'past':
+          return dueDate < today;
+        case 'today':
+          return dueDate.getTime() === today.getTime();
+        case 'this-week':
+          const thisWeekEnd = new Date(today);
+          thisWeekEnd.setDate(today.getDate() + (6 - today.getDay()));
+          return dueDate > today && dueDate <= thisWeekEnd;
+        case 'next-week':
+          return dueDate >= nextWeekStart && dueDate <= nextWeekEnd;
+        case 'later':
+          return dueDate > nextWeekEnd;
+        case 'no-date':
+          return !task.dueDate;
+        default:
+          return true;
+      }
+    }).length;
+  };
+
+  const timeCategories = [
+    { id: 'all', label: 'Todas', icon: <Calendar size={16} /> },
+    { id: 'past', label: 'Días anteriores', icon: <Clock size={16} /> },
+    { id: 'today', label: 'Hoy', icon: <Calendar size={16} /> },
+    { id: 'this-week', label: 'Esta semana', icon: <Calendar size={16} /> },
+    { id: 'next-week', label: 'Siguiente semana', icon: <Calendar size={16} /> },
+    { id: 'later', label: 'Después', icon: <Calendar size={16} /> },
+    { id: 'no-date', label: 'Sin fecha', icon: <Calendar size={16} /> }
+  ];
+  
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+  };
+  
+  // Función para abrir el modal
+  const openModal = (
+    itemId: string, 
+    fieldName: string, 
+    fieldType: 'text' | 'number' | 'select' = 'text',
+    selectOptions: { value: string; label: string }[] = []
+  ) => {
+    const fieldKey = `${itemId}-${fieldName}`;
+    const currentValue = fieldValues[fieldKey] || '';
+    
+    setModalState({
+      isOpen: true,
+      fieldName,
+      fieldType,
+      initialValue: currentValue,
+      selectOptions,
+      onSave: (value: string) => {
+        const updatedValues = {
+          ...fieldValues,
+          [fieldKey]: value
+        };
+        setFieldValues(updatedValues);
+        
+        // Guardar en localStorage
+        storage.setItem('fieldValues', updatedValues);
+      }
+    });
+  };
+
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setModalState(prev => ({
+      ...prev,
+      isOpen: false
+    }));
+  };
+
+  // Función para obtener el valor de un campo
+  const getFieldValue = (itemId: string, fieldName: string) => {
+    const fieldKey = `${itemId}-${fieldName}`;
+    return fieldValues[fieldKey] || '';
+  };
+  
+  {/* Mapeo de secciones con sus títulos correctos */}
+  const sectionMapping = {
+    'estrategia': 'Set Up Estrategia Digital',
+    'antropologicos': 'Estudios Antropológicos', 
+    'otros-estudios': 'Otros Estudios',
+    'acompanamiento': 'Set Up Acompañamiento Digital',
+    'gerencia': 'Set Up Gerencia Digital',
+    'produccion': 'Set Up Producción',
+    'difusion': 'Set up Difusión'
+  };
+  
+  // Función para obtener el nombre de la sección a partir del sectionId
+  const getSectionNameFromId = (sectionId: string): string => {
+    return sectionMapping[sectionId as keyof typeof sectionMapping] || sectionId;
+  };
+
+  // Función para manejar la selección de cuenta
+  const handleSelectAccount = (accountId: number, accountName: string) => {
+    setSelectedAccount({ id: accountId, name: accountName });
+    
+    // Guardar la cuenta seleccionada en localStorage
+    storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
+    
+    // Reset filtered items and grouped items
+    setFilteredProjectItems([]);
+    
+    setIsLoading(true);
+    
+    // Simular carga de datos
+    setTimeout(() => {
+      // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
+      setIsLoading(false);
+    }, 800);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Header 
-        user={user}
-        onLogout={() => setShowLogoutDialog(true)}
-      />
+    <div className={`workhub-page ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+      <MenuBackground />
       
-      <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Work Hub</h1>
-          <p className="text-gray-600">
-            Manage your projects and files for {selectedClient?.name}
-          </p>
+      <div className="workhub-header">
+        <div className="workhub-breadcrumb-container">
+          <span className="workhub-breadcrumb-separator">/</span>
+          <button 
+            onClick={() => navigate('/dashboard')}
+            className="workhub-breadcrumb-link"
+          >
+            Menú
+          </button>
         </div>
-
-        {error && (
-          <div className="mb-6">
-            <ErrorMessage message={error} />
-          </div>
-        )}
-
-        {/* Toolbar */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search files and folders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Filter className="text-gray-400 w-4 h-4" />
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value as any)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Items</option>
-                  <option value="folders">Folders Only</option>
-                  <option value="files">Files Only</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              {/* View Mode Toggle */}
-              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Create Actions */}
-              <button
-                onClick={() => handleCreateNew('folder')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                New Folder
-              </button>
-              
-              <button
-                onClick={() => handleCreateNew('file')}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                New File
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Content Area */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          {filteredItems.length === 0 ? (
-            <div className="text-center py-12">
-              <FolderOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
-              <p className="text-gray-500 mb-6">
-                {searchTerm || filterType !== 'all' 
-                  ? 'Try adjusting your search or filter criteria'
-                  : 'Get started by creating your first folder or file'
-                }
-              </p>
-              {!searchTerm && filterType === 'all' && (
-                <div className="flex justify-center gap-3">
-                  <button
-                    onClick={() => handleCreateNew('folder')}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create Folder
-                  </button>
-                  <button
-                    onClick={() => handleCreateNew('file')}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create File
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-6">
-                  {filteredItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="group relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center mb-3">
-                        {item.type === 'folder' ? (
-                          <FolderOpen className="w-8 h-8 text-blue-500" />
-                        ) : (
-                          <FileText className="w-8 h-8 text-gray-500" />
-                        )}
-                        <div className="ml-3 flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {item.name}
-                          </h4>
-                          <p className="text-xs text-gray-500">
-                            {formatDate(item.modified)}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {item.size && (
-                        <p className="text-xs text-gray-500 mb-3">
-                          {formatFileSize(item.size)}
-                        </p>
-                      )}
-
-                      {/* Actions */}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(item);
-                            }}
-                            className="p-1 text-gray-400 hover:text-blue-500 hover:bg-white rounded"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(item);
-                            }}
-                            className="p-1 text-gray-400 hover:text-red-500 hover:bg-white rounded"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-200">
-                  {filteredItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="group flex items-center justify-between p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center flex-1 min-w-0">
-                        {item.type === 'folder' ? (
-                          <FolderOpen className="w-5 h-5 text-blue-500 mr-3" />
-                        ) : (
-                          <FileText className="w-5 h-5 text-gray-500 mr-3" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {item.name}
-                          </h4>
-                          <p className="text-xs text-gray-500">
-                            {formatDate(item.modified)}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-4">
-                        {item.size && (
-                          <span className="text-sm text-gray-500">
-                            {formatFileSize(item.size)}
-                          </span>
-                        )}
-                        
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(item);
-                            }}
-                            className="p-2 text-gray-400 hover:text-blue-500 hover:bg-gray-100 rounded"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(item);
-                            }}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
+        
+        <h1 className="workhub-title">
+          WORKHUB {selectedAccount && activeTab === 'proyecto' && <AccountBadge accountName={selectedAccount.name} />}
+        </h1>
+        
+        <div className="header-right">
+          {activeTab === 'proyecto' && <button 
+            className="account-select-button"
+            onClick={() => setShowAccountModal(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              backdropFilter: 'blur(10px)',
+              ...(isDarkMode ? {
+                background: 'rgba(147, 112, 219, 0.15)',
+                border: '1px solid rgba(147, 112, 219, 0.3)',
+                color: 'rgba(255, 255, 255, 0.9)'
+              } : {
+                background: 'rgba(1, 113, 226, 0.1)',
+                border: '1px solid rgba(1, 113, 226, 0.3)',
+                color: '#0171E2'
+              })
+            }}
+          > 
+            <Users size={16} style={{ flexShrink: 0 }} />
+            <span>Seleccionar cuenta</span>
+          </button>}
         </div>
       </div>
 
-      {/* Modals */}
+      <div className={`workhub-content ${isVisible ? 'visible' : ''}`}>
+        {/* Tab Navigation */}
+        <div className="tab-navigation">
+          <button 
+            className={`tab-button ${activeTab === 'tareas' ? 'active' : ''}`}
+            onClick={() => setActiveTab('tareas')}
+          >
+            <span>TAREAS</span>
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'proyecto' ? 'active' : ''}`}
+            onClick={() => setActiveTab('proyecto')}
+          >
+            <span>PROYECTO</span>
+          </button>
+        </div>
+        
+        {/* Time Categories - Solo mostrar cuando el tab activo es 'tareas' */}
+        {activeTab === 'tareas' && (
+          <div className="time-categories">
+            {timeCategories.map(category => (
+              <button 
+                key={category.id} 
+                className={`time-category ${selectedCategory === category.id ? 'active' : ''} ${getTaskCountForCategory(category.id) === 0 ? 'empty' : ''}`}
+                onClick={() => handleCategoryClick(category.id)}
+              >
+                <div className="category-count">{getTaskCountForCategory(category.id)}</div>
+                <div className="category-label">
+                  {category.icon}
+                  <span>{category.label}</span>
+                </div>
+                {selectedCategory === category.id && (
+                  <div className="selected-indicator">
+                    <CheckCircle size={14} />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+        
+        {/* Task Cards Grid - 20% más grande */}
+        {activeTab === 'tareas' ? (
+          <div className="task-cards-container">
+            <div className="task-cards-grid">
+              {filteredTasks && filteredTasks.length > 0 ? (
+                filteredTasks.map((task) => (
+                  <div key={task.itemId} className="task-card">
+                    <div className="task-card-header">
+                      <div className="task-card-section">{task.section || "Sin sección"}</div>
+                      <div className="task-card-date">
+                        <Calendar size={14} />
+                        <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString('es-ES', { 
+                          year: 'numeric',
+                          month: 'short', 
+                          day: 'numeric' 
+                        }) : 'Sin fecha'}</span>
+                      </div>
+                    </div>
+                    <div className="task-card-content">
+                      <h3 className="task-card-title">{task.concept || task.itemId || "Tarea sin nombre"}</h3>
+                      <div className="task-card-footer">
+                        <div className="task-card-code">{task.itemId || task.code || "Sin código"}</div>
+                        {task.completed && (
+                          <div className="task-completed-badge">
+                            <CheckCircle size={16} />
+                            <span>Completada</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-tasks-message">
+                  <AlertCircle size={48} />
+                  <h3>No tienes tareas asignadas</h3>
+                  <p>No se encontraron tareas en esta categoría</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="project-table-container">
+            {isLoading ? (
+              <div className="project-loading-state">
+                <div className="loading-spinner"></div>
+                <p>Cargando datos de la cuenta...</p>
+              </div>
+            ) : (
+              <div className="project-table-wrapper">
+                <table className="project-table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Subele...</th>
+                      <th>Fase</th>
+                      <th>Línea estratégica</th>
+                      <th>Microcampaña</th>
+                      <th>Estatus</th>
+                      <th>Gerente</th>
+                      <th>Colaboradores</th>
+                      <th>Nombre del colaborador</th>
+                      <th>Perfil de colaborador</th>
+                      <th>Solicitud y entrega</th>
+                      <th>Semana en curso</th>
+                      <th>Tipo de item</th>
+                      <th>Cantidad V...</th>
+                      <th>Cantidad Pr...</th>
+                      <th>Cantidad A...</th>
+                      <th>Fecha de finalización</th>
+                      <th>Repositorio de co...</th>
+                      <th>Repositorio firma...</th>
+                      <th>Enlace de repositorio</th>
+                      <th>Desarrollo creativo</th>
+                      <th>Fecha testeo</th>
+                      <th>Estatus testeo</th>
+                      <th>Entrega al cliente</th>
+                      <th>Nombre del archivo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedAccount && Object.keys(groupedItems).length > 0 ? (
+                      sectionOrder.map(sectionName => {
+                        const items = groupedItems[sectionName] || [];
+                        if (items.length === 0) return null;
+                        
+                        return (
+                          <React.Fragment key={sectionName}>
+                            <tr className="section-header">
+                              <td colSpan={26} className="section-title">
+                                {sectionName}
+                              </td>
+                            </tr>
+                            {items.map((item) => (
+                              <tr key={item.id} className={item.completed ? "completed-item" : ""}>
+                                <td className="item-code-cell">
+                                  <div className="item-code">{item.id}</div>
+                                  <div className="item-concept-cell">{item.concept}</div>
+                                </td>
+                                <td>
+                                  <button className="project-action-btn upload-btn">
+                                    <ArrowUp size={16} />
+                                  </button>
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'fase')}
+                                    placeholder="Fase" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Fase')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'linea_estrategica')}
+                                    placeholder="Línea estratégica" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Línea estratégica')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'microcampana')}
+                                    placeholder="Microcampaña" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Microcampaña')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'estatus')}
+                                    placeholder="Estatus" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Estatus')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'gerente')}
+                                    placeholder="Gerente" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Gerente')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'colaboradores')}
+                                    placeholder="Colaboradores" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Colaboradores')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'nombre_colaborador')}
+                                    placeholder="Nombre del colaborador" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Nombre del colaborador')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'perfil_colaborador')}
+                                    placeholder="Perfil de colaborador" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Perfil de colaborador')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'solicitud_entrega')}
+                                    placeholder="Solicitud y entrega" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Solicitud y entrega')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'semana_curso')}
+                                    placeholder="Semana en curso" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Semana en curso')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'tipo_item')}
+                                    placeholder="Tipo de item" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Tipo de item')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'cantidad_v')}
+                                    placeholder="Cantidad V..." 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Cantidad V...', 'number')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'cantidad_pr')}
+                                    placeholder="Cantidad Pr..." 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Cantidad Pr...', 'number')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'cantidad_a')}
+                                    placeholder="Cantidad A..." 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Cantidad A...', 'number')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="date" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'fecha_finalizacion')}
+                                    onChange={(e) => {
+                                      const updatedValues = {
+                                        ...fieldValues,
+                                        [`${item.id}-fecha_finalizacion`]: e.target.value
+                                      };
+                                      setFieldValues(updatedValues);
+                                      storage.setItem('fieldValues', updatedValues);
+                                    }}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'repositorio_co')}
+                                    placeholder="Repositorio de co..." 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Repositorio de co...')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'repositorio_firma')}
+                                    placeholder="Repositorio firma..." 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Repositorio firma...')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'enlace_repositorio')}
+                                    placeholder="Enlace de repositorio" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Enlace de repositorio')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'desarrollo_creativo')}
+                                    placeholder="Desarrollo creativo" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Desarrollo creativo')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="date" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'fecha_testeo')}
+                                    onChange={(e) => {
+                                      const updatedValues = {
+                                        ...fieldValues,
+                                        [`${item.id}-fecha_testeo`]: e.target.value
+                                      };
+                                      setFieldValues(updatedValues);
+                                      storage.setItem('fieldValues', updatedValues);
+                                    }}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'estatus_testeo')}
+                                    placeholder="Estatus testeo" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Estatus testeo')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'entrega_cliente')}
+                                    placeholder="Entrega al cliente" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Entrega al cliente')}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    className="project-input" 
+                                    value={getFieldValue(item.id, 'nombre_archivo')}
+                                    placeholder="Nombre del archivo" 
+                                    readOnly
+                                    onClick={() => openModal(item.id, 'Nombre del archivo')}
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
+                        );
+                      })
+                    ) : (
+                      <tr style={{ height: '300px' }}>
+                        <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                          {isLoading ? (
+                            <div className="project-loading-state">
+                              <div className="loading-spinner"></div>
+                              <p>Cargando datos de la cuenta...</p>
+                            </div>
+                          ) : (
+                            <div className="empty-project-content">
+                              
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <InputModal
+        isOpen={modalState.isOpen}
+        onClose={closeModal}
+        onSave={modalState.onSave}
+        initialValue={modalState.initialValue}
+        fieldName={modalState.fieldName}
+        fieldType={modalState.fieldType}
+        selectOptions={modalState.selectOptions}
+      />
+
       <SelectAccountModalForWorkHub
         isOpen={showAccountModal}
         onClose={() => setShowAccountModal(false)}
+        onSelectAccount={handleSelectAccount}
       />
 
-      <FileNameEditModal
-        isOpen={showFileNameModal}
-        onClose={() => {
-          setShowFileNameModal(false);
-          setSelectedItem(null);
+      <button 
+        className="logout-button"
+        onClick={() => setShowLogoutDialog(true)}
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          right: '2rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          padding: '0.5rem 1rem',
+          border: 'none',
+          borderRadius: '20px',
+          fontSize: '0.875rem',
+          cursor: 'pointer',
+          zIndex: 10,
+          backdropFilter: 'blur(10px)',
+          transition: 'all 0.2s ease',
+          ...(isDarkMode ? {
+            background: 'rgba(59, 130, 246, 0.15)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            color: 'rgba(255, 255, 255, 0.7)'
+          } : {
+            background: 'rgba(253, 253, 254, 0.95)',
+            color: '#0171E2',
+            border: '2px solid #0171E2',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
+          })
         }}
-        onSave={handleSaveFileName}
-        initialName={selectedItem?.name || ''}
-        type={selectedItem?.type || 'file'}
-      />
-
-      <DeleteConfirmationModal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setSelectedItem(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        itemName={selectedItem?.name || ''}
-        itemType={selectedItem?.type || 'file'}
-      />
+      >
+        <LogOut size={16} />
+        <span>Cerrar sesión</span>
+      </button>
 
       <LogoutDialog
         isOpen={showLogoutDialog}
