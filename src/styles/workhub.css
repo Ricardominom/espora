@@ -799,7 +799,7 @@
 }
 .project-table-container {
   width: 100%;
-  height: 600px;
+  height: 400px;
   overflow-x: auto;
   overflow-y: auto;
   border-radius: 16px;
@@ -1153,7 +1153,7 @@
 
 .project-table-wrapper {
   width: 100%;
-  height: 600px;
+  height: 100%;
   overflow-x: auto;
   overflow-y: auto;
   padding: 1rem;
