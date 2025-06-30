@@ -277,7 +277,9 @@ const WorkHubPage: React.FC = () => {
       
       if (!task.dueDate) return selectedCategory === 'no-date'; 
       
-      const dueDate = new Date(task.dueDate);
+      // Create date without timezone adjustments by using the date parts directly
+      const dateParts = task.dueDate.split('-').map(part => parseInt(part, 10));
+      const dueDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
       dueDate.setHours(0, 0, 0, 0);
       
       switch (selectedCategory) {
@@ -332,7 +334,9 @@ const WorkHubPage: React.FC = () => {
     return taskAssignments.filter(task => {
       if (!task.dueDate || !task.itemId || !(task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) return false;
       
-      const dueDate = new Date(task.dueDate);
+      // Create date without timezone adjustments by using the date parts directly
+      const dateParts = task.dueDate.split('-').map(part => parseInt(part, 10));
+      const dueDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
       dueDate.setHours(0, 0, 0, 0);
       
       switch (categoryId) {
@@ -560,8 +564,9 @@ const WorkHubPage: React.FC = () => {
                         <Calendar size={14} />
                         <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString('es-ES', { 
                           year: 'numeric',
-                          month: 'short', 
-                          day: 'numeric' 
+                          month: 'short',
+                          day: 'numeric',
+                          timeZone: 'UTC' // Use UTC to prevent timezone adjustments
                         }) : 'Sin fecha'}</span>
                       </div>
                     </div>
