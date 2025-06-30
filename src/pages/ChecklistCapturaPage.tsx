@@ -37,6 +37,7 @@ const ChecklistCapturaPage: React.FC = () => {
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [users, setUsers] = useState<Omit<User, 'password'>[]>([]);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [completedItems, setCompletedItems] = useState<{[key: string]: boolean}>({});
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showAccessDeniedModal, setShowAccessDeniedModal] = useState(false);
   const { logout, user: currentUser } = useAuthStore();
@@ -44,7 +45,17 @@ const ChecklistCapturaPage: React.FC = () => {
     try {
       // Intentar cargar las asignaciones de tareas desde localStorage
       const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments');
-      return savedAssignments || [];
+      const assignments = savedAssignments || [];
+      
+      // Actualizar el estado de completado de los items basado en las asignaciones
+      const completedItemsMap: {[key: string]: boolean} = {};
+      assignments.forEach(assignment => {
+        if (assignment.completed) {
+          completedItemsMap[assignment.itemId] = true;
+        }
+      });
+      
+      return assignments;
     } catch (error) {
       console.error('Error loading task assignments:', error);
       return [];
@@ -144,6 +155,7 @@ const ChecklistCapturaPage: React.FC = () => {
 
   useEffect(() => {
     const state = location.state as any;
+    
     if (state && state.clientName) {
       setClientName(state.clientName);
     }
@@ -156,6 +168,7 @@ const ChecklistCapturaPage: React.FC = () => {
       if (savedItems && savedFormData) {
         generateChecklistItems(savedItems, savedFormData);
       }
+      
     } else {
       generateChecklistItems(state.selectedItems, state.allData);
     }
@@ -163,6 +176,19 @@ const ChecklistCapturaPage: React.FC = () => {
 
   // Función para generar los items del checklist
   const generateChecklistItems = (selectedItems: {[key: string]: boolean}, allData: {[key: string]: any[]}) => {
+    // Cargar el estado de completado de los items desde localStorage
+    const savedCompletedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
+    setCompletedItems(savedCompletedItems);
+    
+    // También cargar el estado de completado desde las asignaciones de tareas
+    const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+    const completedFromAssignments: {[key: string]: boolean} = {};
+    savedAssignments.forEach(assignment => {
+      if (assignment.completed) {
+        completedFromAssignments[assignment.itemId] = true;
+      }
+    });
+    
     const items: ChecklistItem[] = [];
 
     // Process each section type
@@ -175,7 +201,8 @@ const ChecklistCapturaPage: React.FC = () => {
             id: item.id,
             concept: item.concept,
             section: sectionName,
-            sectionId: sectionId,
+            sectionId,
+            completed: savedCompletedItems[item.id] || completedFromAssignments[item.id] || false,
             completed: false
           });
         }
@@ -202,7 +229,7 @@ const ChecklistCapturaPage: React.FC = () => {
   useEffect(() => {
     setIsVisible(true); 
     
-    // Cargar el estado de completado de los items desde localStorage
+    // Cargar el estado de completado de los items desde localStorage y asignaciones
     const savedCompletedItems = storage.getItem<{[key: string]: boolean}>('completedItems');
     if (savedCompletedItems) {
       setChecklistItems(prevItems => 
@@ -211,6 +238,19 @@ const ChecklistCapturaPage: React.FC = () => {
           completed: savedCompletedItems[item.id] || false
         }))
       );
+      setCompletedItems(savedCompletedItems);
+    }
+    
+    // También cargar el estado de completado desde las asignaciones de tareas
+    const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+    if (savedAssignments.length > 0) {
+      const completedFromAssignments: {[key: string]: boolean} = {};
+      savedAssignments.forEach(assignment => {
+        if (assignment.completed) {
+          completedFromAssignments[assignment.itemId] = true;
+        }
+      });
+      setCompletedItems(prev => ({...prev, ...completedFromAssignments}));
     }
   }, []);
 
@@ -224,6 +264,7 @@ const ChecklistCapturaPage: React.FC = () => {
     );
     
     setChecklistItems(updatedItems);
+    setCompletedItems(prev => ({...prev, [itemId]: !prev[itemId]}));
     
     // Guardar el estado de completado en localStorage
     const completedItemsMap = updatedItems.reduce((acc, item) => {
@@ -241,7 +282,8 @@ const ChecklistCapturaPage: React.FC = () => {
         // Obtener el nuevo estado de completado
         const isCompleted = updatedItems.find(i => i.id === itemId)?.completed || false;
         
-        // Find if there's an existing assignment
+        // Buscar si ya existe una asignación para este item
+        // Si existe, actualizar el estado de completado
         const assignmentIndex = taskAssignments.findIndex(a => a.itemId === itemId);
         if (assignmentIndex >= 0) {
           const updatedAssignments = [...taskAssignments];
@@ -250,6 +292,7 @@ const ChecklistCapturaPage: React.FC = () => {
             ...updatedAssignments[assignmentIndex],
             completed: isCompleted
           };
+          
           setTaskAssignments(updatedAssignments);
           
           // Save to localStorage
@@ -260,7 +303,8 @@ const ChecklistCapturaPage: React.FC = () => {
             itemId,
             userId: assignedUserId,
             concept: item.concept,
-            section: item.section,
+            section: item.section || getSectionName(item.sectionId),
+            sectionId: item.sectionId,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',
             completed: isCompleted
@@ -272,6 +316,20 @@ const ChecklistCapturaPage: React.FC = () => {
         }
       }
     }
+  };
+  
+  // Función para obtener el nombre de la sección
+  const getSectionName = (sectionId: string): string => {
+    const sectionMapping: {[key: string]: string} = {
+      'estrategia': 'Set Up Estrategia Digital',
+      'antropologicos': 'Estudios Antropológicos', 
+      'otros-estudios': 'Otros Estudios',
+      'acompanamiento': 'Set Up Acompañamiento Digital',
+      'gerencia': 'Set Up Gerencia Digital',
+      'produccion': 'Set Up Producción',
+      'difusion': 'Set up Difusión'
+    };
+    return sectionMapping[sectionId] || sectionId;
   };
 
   // Función para eliminar un item del checklist
@@ -300,6 +358,13 @@ const ChecklistCapturaPage: React.FC = () => {
     const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
     delete completedItems[itemToDelete];
     storage.setItem('completedItems', completedItems);
+    
+    // También eliminar el item de las asignaciones de tareas
+    const updatedAssignments = taskAssignments.filter(assignment => assignment.itemId !== itemToDelete);
+    if (updatedAssignments.length !== taskAssignments.length) {
+      setTaskAssignments(updatedAssignments);
+      storage.setItem('taskAssignments', updatedAssignments);
+    }
     
     // Actualizar el conteo de progreso
     const updatedItems = checklistItems.filter(item => item.id !== itemToDelete);
@@ -398,6 +463,7 @@ const ChecklistCapturaPage: React.FC = () => {
     if (currentUser && hasPermission(currentUser, 'assign_tasks')) {
       const updatedValues = {
         ...fieldValues,
+        // Guardar el usuario asignado en los valores de campo
         [fieldKey]: userId
       };
       setFieldValues(updatedValues);
@@ -405,7 +471,7 @@ const ChecklistCapturaPage: React.FC = () => {
       // Si se seleccionó un usuario y existe el item, actualizar las asignaciones de tareas
       if (userId && item) { 
         // Verificar si ya existe una asignación para este item
-        const existingAssignmentIndex = taskAssignments.findIndex(
+        let existingAssignmentIndex = taskAssignments.findIndex(
           assignment => assignment.itemId === itemId
         );
         
@@ -415,7 +481,8 @@ const ChecklistCapturaPage: React.FC = () => {
           updatedAssignments[existingAssignmentIndex] = {
             ...updatedAssignments[existingAssignmentIndex],
             userId: userId,
-           concept: item.concept,
+            concept: item.concept,
+            sectionId: item.sectionId,
            section: item.section,
            sectionId: item.sectionId,
             completed: item.completed
@@ -430,6 +497,7 @@ const ChecklistCapturaPage: React.FC = () => {
             concept: item.concept, 
             section: item.section,
             sectionId: item.sectionId,
+            completed: item.completed,
             dueDate: dueDates[itemId] || '',
             completed: item.completed
           };
@@ -438,6 +506,9 @@ const ChecklistCapturaPage: React.FC = () => {
           setTaskAssignments(newAssignments);
           storage.setItem('taskAssignments', newAssignments);
         }
+      } else if (!userId) {
+        // Si se deseleccionó el usuario, eliminar la asignación
+        handleRemoveAssignment(itemId);
       }
       
       // Guardar en localStorage
@@ -445,6 +516,18 @@ const ChecklistCapturaPage: React.FC = () => {
     } else {
       // Mostrar modal de acceso denegado
       setShowAccessDeniedModal(true);
+    }
+  };
+  
+  // Función para eliminar una asignación
+  const handleRemoveAssignment = (itemId: string) => {
+    const updatedAssignments = taskAssignments.filter(
+      assignment => assignment.itemId !== itemId
+    );
+    
+    if (updatedAssignments.length !== taskAssignments.length) {
+      setTaskAssignments(updatedAssignments);
+      storage.setItem('taskAssignments', updatedAssignments);
     }
   };
 
@@ -471,6 +554,7 @@ const ChecklistCapturaPage: React.FC = () => {
 
   // Efecto para guardar las asignaciones de tareas cuando cambian
   useEffect(() => {
+    console.log("Saving task assignments:", taskAssignments.length);
     storage.setItem('taskAssignments', taskAssignments);
     
     // También guardar el estado de completado de los items
@@ -479,7 +563,7 @@ const ChecklistCapturaPage: React.FC = () => {
       return acc;
     }, {} as {[key: string]: boolean});
     
-    storage.setItem('completedItems', completedItemsMap);
+    storage.setItem('completedItems', {...completedItems, ...completedItemsMap});
   }, [taskAssignments]);
 
   // Opciones para los selects
