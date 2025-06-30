@@ -1,8 +1,8 @@
 .checklist-captura-page {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto; /* Scroll vertical para toda la página */
+  overflow-x: hidden; 
+  overflow-y: scroll; /* Ensure vertical scroll is always available */
   display: flex;
   flex-direction: column;
   padding: 0.3rem;
@@ -12,15 +12,18 @@
   /* Asegurar que el fondo cubra toda la pantalla */
   width: 100vw;
   min-height: 100vh; /* Permitir que crezca más allá de la pantalla */
+  max-height: none; /* Remove max-height restriction */
 }
 
 /* Habilitar scroll visible en toda la página */
 .checklist-captura-page::-webkit-scrollbar {
-  width: 12px;
+  width: 14px; /* Slightly wider scrollbar for better usability */
+  display: block; /* Ensure scrollbar is always visible */
 }
 
 .checklist-captura-page::-webkit-scrollbar-track {
   border-radius: 6px;
+  margin: 4px 0; /* Add some margin for better appearance */
 }
 
 /* Dark theme page scrollbar */
@@ -482,12 +485,12 @@
   transform: translateY(20px);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 150px);
   height: fit-content;
   overflow: visible;
   position: relative;
   z-index: 2;
-  padding: 0.5rem 2rem 8rem 2rem; /* Más padding lateral y inferior */
+  padding: 0.5rem 2rem 10rem 2rem; /* More bottom padding to ensure content is visible when scrolling */
   /* Asegurar que el contenido tenga el fondo correcto */
   background: transparent;
 }
@@ -501,7 +504,7 @@
 .checklist-table-container {
   width: 100%;
   height: fit-content; /* Altura automática basada en contenido */
-  min-height: 400px;
+  min-height: 600px; /* Increased minimum height */
   overflow: hidden;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -512,7 +515,7 @@
   display: flex;
   flex-direction: column;
   scrollbar-width: none;
-  margin-bottom: 2rem; /* Margen normal en el contenedor de la tabla */
+  margin-bottom: 4rem; /* Increased bottom margin to ensure space at the bottom */
   padding: 0.575rem; /* Padding aumentado 15% */
   /* Asegurar que el contenedor mantenga transparencia */
   background-color: transparent !important;
@@ -654,7 +657,7 @@
 .table-main-container {
   width: 100%;
   height: fit-content; /* Altura automática */
-  min-height: 300px;
+  min-height: 500px; /* Increased minimum height */
   max-height: none; /* Sin límite de altura máxima */
   overflow-y: visible; /* Sin scroll vertical en la tabla */
   overflow-x: hidden; /* Eliminar completamente el scroll horizontal */
@@ -1386,11 +1389,11 @@
 /* Responsive adjustments */
 @media (max-width: 1400px) {
   .checklist-content {
-    padding: 0.575rem 0.46rem 4rem 0.46rem; /* 15% más en general, ajustado para pantallas medianas */
+    padding: 0.575rem 0.46rem 6rem 0.46rem; /* More bottom padding */
   }
   
   .checklist-content.visible {
-    padding: 0.575rem 0.46rem 4rem 0.46rem;
+    padding: 0.575rem 0.46rem 6rem 0.46rem;
   }
   
   .checklist-table-container {
@@ -1418,11 +1421,11 @@
 
 @media (max-width: 768px) {
   .checklist-content {
-    padding: 0.575rem 0.345rem 4rem 0.345rem; /* 15% más para móviles */
+    padding: 0.575rem 0.345rem 6rem 0.345rem; /* More bottom padding for mobile */
   }
   
   .checklist-content.visible {
-    padding: 0.575rem 0.345rem 4rem 0.345rem;
+    padding: 0.575rem 0.345rem 6rem 0.345rem;
   }
   
   .checklist-table-container {
