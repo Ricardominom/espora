@@ -1,8 +1,8 @@
 .checklist-captura-page {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto; /* Scroll vertical para toda la página */
+  overflow-x: hidden; 
+  overflow-y: scroll; /* Scroll vertical para toda la página */
   display: flex;
   flex-direction: column;
   padding: 0.3rem;
@@ -16,7 +16,8 @@
 
 /* Habilitar scroll visible en toda la página */
 .checklist-captura-page::-webkit-scrollbar {
-  width: 12px;
+  width: 14px;
+  display: block;
 }
 
 .checklist-captura-page::-webkit-scrollbar-track {
@@ -45,7 +46,8 @@
 
 .checklist-captura-page::-webkit-scrollbar-thumb {
   border-radius: 6px;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; 
+  min-height: 40px;
 }
 
 /* Dark theme page scrollbar thumb */
@@ -55,6 +57,7 @@
     rgba(186, 156, 255, 0.9) 100%
   );
   border: 1px solid rgba(147, 112, 219, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Light theme page scrollbar thumb */
@@ -64,6 +67,7 @@
     #4A90E2 100%
   );
   border: 1px solid rgba(1, 113, 226, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* Dark theme page scrollbar hover */
@@ -109,10 +113,6 @@
     radial-gradient(circle at 80% 80%, rgba(212, 235, 246, 0.3) 0%, transparent 50%);
   pointer-events: none;
   z-index: 1;
-}
-
-.checklist-captura-page::-webkit-scrollbar {
-  display: none;
 }
 
 .checklist-header {
@@ -484,10 +484,10 @@
   margin: 0;
   min-height: calc(100vh - 120px);
   height: fit-content;
-  overflow: visible;
+  overflow: visible; 
   position: relative;
   z-index: 2;
-  padding: 0.5rem 2rem 8rem 2rem; /* Más padding lateral y inferior */
+  padding: 0.5rem 2rem 8rem 2rem; /* Más padding lateral e inferior */
   /* Asegurar que el contenido tenga el fondo correcto */
   background: transparent;
 }
@@ -502,7 +502,7 @@
   width: 100%;
   height: fit-content; /* Altura automática basada en contenido */
   min-height: 400px;
-  overflow: hidden;
+  overflow: visible;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -655,9 +655,9 @@
   width: 100%;
   height: fit-content; /* Altura automática */
   min-height: 300px;
-  max-height: none; /* Sin límite de altura máxima */
-  overflow-y: visible; /* Sin scroll vertical en la tabla */
-  overflow-x: hidden; /* Eliminar completamente el scroll horizontal */
+  max-height: none;
+  overflow-y: visible;
+  overflow-x: auto;
   scrollbar-width: thin;
   padding: 0 0.575rem; /* Padding lateral aumentado 15% */
   /* Mantener fondo transparente */
@@ -770,7 +770,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 0.8rem;
+  font-size: 0.8rem; 
   background: transparent;
   min-width: 4000px; /* Ancho aumentado para mostrar todas las columnas completamente */
   margin: 0 auto; /* Centrar la tabla */
@@ -1450,7 +1450,27 @@
   }
   
   .checklist-content {
-    height: calc(100vh - 120px);
+    height: calc(100vh - 100px);
+    max-height: calc(100vh - 100px);
+    padding: 0.5rem 1rem 6rem 1rem;
+  }
+  
+  .form-step-content {
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    padding: 0.25rem 0.5rem 4rem 0.5rem;
+  }
+  
+  .expediente-content {
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    padding: 0.25rem 0.5rem 4rem 0.5rem;
+  }
+  
+  .form-step-content {
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    padding: 0.25rem 0.5rem 4rem 0.5rem;
   }
   
   .checklist-table {
