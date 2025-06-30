@@ -15,10 +15,10 @@ interface SelectAccountModalForWorkHubProps {
   onSelectAccount: (accountId: number, accountName: string) => void;
 }
 
-const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSelectAccount 
+const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> = ({
+  isOpen,
+  onClose,
+  onSelectAccount
 }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
@@ -34,7 +34,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
         { id: 4, name: 'Ana Martínez', position: 'Senadora', isActive: true },
         { id: 6, name: 'Laura Hernández', position: 'Diputada Local', isActive: true }
       ];
-      
+
       // Filter only active accounts
       const activeAccounts = mockAccounts.filter(account => account.isActive);
       setAccounts(activeAccounts);
@@ -58,6 +58,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
     e.preventDefault();
     if (selectedAccountId) {
       const accountId = parseInt(selectedAccountId);
+      console.log("Selected account ID:", accountId);
       const account = accounts.find(acc => acc.id === accountId);
       if (account) {
         onSelectAccount(accountId, `${account.name} - ${account.position}`);
@@ -88,7 +89,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
               required
               value={selectedAccountId}
               onChange={(e) => setSelectedAccountId(e.target.value)}
-              style={{ 
+              style={{
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 0.75rem center',
                 backgroundSize: '16px'
@@ -107,7 +108,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
             <button type="button" onClick={onClose} className="cancel-button">
               Cancelar
             </button>
-            <button 
+            <button
               type="submit" 
               className="submit-button"
               disabled={!selectedAccountId}

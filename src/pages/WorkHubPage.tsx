@@ -40,8 +40,8 @@ const WorkHubPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
-  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
-  const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
+  const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({});
   const [sectionOrder, setSectionOrder] = useState<string[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
     // Intentar cargar los valores de los campos desde localStorage
@@ -107,29 +107,17 @@ const WorkHubPage: React.FC = () => {
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
+    let combined: (ProjectItem | TaskAssignment)[] = [];
     
-    // Only add task assignments to project items if we're in the tareas tab
-    // For proyecto tab, we only show items from the selected account
-    if (activeTab === 'tareas') {
-      // Add task assignments that aren't already in project items
-      taskAssignments.forEach(task => {
-        // Check if this task is already in project items
-        const existingItem = projectItems.find(item => item.id === task.itemId);
-        
-        // If not found and it's a valid task with an itemId, add it
-        if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
-          combined.push({
-            id: task.itemId,
-            concept: task.concept || "Tarea sin nombre",
-            section: task.section || "Sin sección",
-            sectionId: task.sectionId || "",
-            completed: task.completed || false,
-            isTaskAssignment: true
-          });
-        }
-      });
+    if (activeTab === 'proyecto') {
+      // For proyecto tab, we only show project items from the selected account
+      combined = [...projectItems];
+    } else {
+      // For tareas tab, we show task assignments
+      combined = [...taskAssignments];
     }
+    
+    console.log(`Combined items for ${activeTab} tab:`, combined.length);
     
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
@@ -158,6 +146,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
+    console.log("Grouped items:", Object.keys(grouped).length, "sections");
   }, [projectItems, taskAssignments, activeTab]);
   
   // Effect to handle tab changes
@@ -166,47 +155,65 @@ const WorkHubPage: React.FC = () => {
       // If switching to project tab without an account selected, show the modal
       setShowAccountModal(true);
     }
+    
+    // If switching to project tab and we have an account selected, reload project items
+    if (activeTab === 'proyecto' && selectedAccount) {
+      setProjectItems([]);
+      loadProjectItems();
+    }
   }, [activeTab, selectedAccount]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
+      setIsLoading(true);
       // Si no hay cuenta seleccionada, no cargar proyectos
       if (!selectedAccount) {
         setProjectItems([]);
+        setIsLoading(false);
         return;
       }
       
-      // Simular carga de proyectos específicos para la cuenta seleccionada
-      // En una aplicación real, aquí se cargarían los proyectos de la cuenta desde una API
-      setTimeout(() => {
-        // Cargar los ítems seleccionados y los datos del formulario
-        let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
-        const formData = storage.getItem<{[key: string]: any[]}>('formData');
+      console.log("Loading project items for account:", selectedAccount);
+      
+      // Cargar los ítems seleccionados y los datos del formulario
+      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      const formData = storage.getItem<{[key: string]: any[]}>('formData');
+      
+      if (formData) {
+        const items: ProjectItem[] = [];
         
-        if (formData) {
-          const items: ProjectItem[] = [];
-          
-          // Procesar cada sección
-          Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
-            data.forEach((item) => {
-              // Solo incluir items reales (que comiencen con A- o B-)
-              if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-                items.push({
-                  id: item.id,
-                  concept: item.concept,
-                  section: getSectionName(sectionId),
-                  sectionId: sectionId
-                });
-              }
-            });
+        // Procesar cada sección
+        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+          data.forEach((item) => {
+            // Solo incluir items reales (que comiencen con A- o B-)
+            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+              items.push({
+                id: item.id,
+                concept: item.concept,
+                section: getSectionName(sectionId),
+                sectionId: sectionId,
+                completed: false // Default value
+              });
+            }
           });
-          
-          setProjectItems(items);
-        }
-      }, 100);
+        });
+        
+        console.log("Project items loaded:", items.length);
+        setProjectItems(items);
+      } else {
+        console.log("No form data found in storage");
+        setProjectItems([]);
+      }
+      
+      // Simulate a short loading time for better UX
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     } catch (error) {
       console.error('Error loading project items:', error);
+      setIsLoading(false);
+      setProjectItems([]);
     }
   };
 
@@ -409,7 +416,7 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
-    setProjectItems([]); // Clear current items
+    setProjectItems([]); // Clear current items before loading new ones
     setIsLoading(true);
     
     // Simular carga de datos
@@ -417,7 +424,7 @@ const WorkHubPage: React.FC = () => {
       // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
       loadProjectItems(); // Load project items for the selected account
       setIsLoading(false);
-    }, 1500);
+    }, 500);
   };
 
   return (
@@ -863,7 +870,7 @@ const WorkHubPage: React.FC = () => {
                 </table>
               </div>
             )}
-          </div>
+          </div> 
         )}
       </div>
 
@@ -916,7 +923,7 @@ const WorkHubPage: React.FC = () => {
         <LogOut size={16} />
         <span>Cerrar sesión</span>
       </button>
-
+      
       <LogoutDialog
         isOpen={showLogoutDialog}
         onClose={() => setShowLogoutDialog(false)}
