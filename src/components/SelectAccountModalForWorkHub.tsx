@@ -109,13 +109,13 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
             <label>Cuentas disponibles</label>
             <div className="accounts-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
               {accounts.map(account => (
-                <option key={account.id} value={account.id} onClick={() => setSelectedAccountId(account.id.toString())} style={{ 
+                <button key={account.id} onClick={() => setSelectedAccountId(account.id.toString())} style={{ 
                   padding: '0.75rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid rgba(0,0,0,0.1)', background: account.id === parseInt(selectedAccountId) ? 'rgba(59, 130, 246, 0.1)' : 'transparent' 
                 }}>
                   {account.name} - {account.position} {account.id === currentAccountId && <CheckCircle size={16} style={{ display: 'inline', marginLeft: '0.5rem', color: 'green' }}/>}
-                </option>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="modal-footer">

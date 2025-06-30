@@ -603,6 +603,7 @@ const WorkHubPage: React.FC = () => {
                                       <span className="status-pending"><Clock4 size={14} /> Pendiente</span>
                                     )}
                                   </div>
+                                  <button className="project-action-btn update-btn">
                                     <FileText size={16} />
                                   </button>
                                 </td>
