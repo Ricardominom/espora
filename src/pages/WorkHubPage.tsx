@@ -634,7 +634,6 @@ const WorkHubPage: React.FC = () => {
                                   <div className="item-code">{item.id}</div>
                                   <div className="item-concept-cell">{item.concept}</div>
                                 </td>
-                                </td>
                                 <td>
                                   <button className="project-action-btn upload-btn">
                                     <ArrowUp size={16} />
