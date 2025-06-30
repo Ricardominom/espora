@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import { useFileStore } from '../stores/fileStore';
 import { useClientStore } from '../stores/clientStore';
 import Header from '../components/Header';
-import { LogoutDialog } from '../components/LogoutDialog';
+import LogoutDialog from '../components/LogoutDialog';
 import { SelectAccountModalForWorkHub } from '../components/SelectAccountModalForWorkHub';
 import FileNameEditModal from '../components/FileNameEditModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
