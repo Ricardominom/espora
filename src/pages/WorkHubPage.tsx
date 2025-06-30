@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { hasPermission, getUserById } from '../data/users';
+import { hasPermission } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
@@ -40,7 +40,7 @@ const WorkHubPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
     // Intentar cargar la cuenta seleccionada desde localStorage
     const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
-    return savedAccount || null;
+    return savedAccount;
   });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
@@ -116,32 +116,31 @@ const WorkHubPage: React.FC = () => {
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    if (!selectedAccount) {
-      // Si no hay cuenta seleccionada, no hay nada que combinar
-      setGroupedItems({});
-      setSectionOrder([]);
-      return;
-    }
+    const combined: (ProjectItem | TaskAssignment)[] = [];
     
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
-    
-    // Add task assignments that aren't already in project items
-    taskAssignments.forEach(task => {
-      // Check if this task is already in project items
-      const existingItem = projectItems.find(item => item.id === task.itemId);
+    // Solo agregar items si hay una cuenta seleccionada
+    if (selectedAccount) {
+      // Agregar los items del proyecto filtrados por la cuenta seleccionada
+      combined.push(...projectItems);
       
-      // If not found and it's a valid task with an itemId, add it
-      if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
-        combined.push({
-          id: task.itemId,
-          concept: task.concept || "Tarea sin nombre",
-          section: task.section || "Sin sección",
-          sectionId: task.sectionId || "",
-          completed: task.completed || false,
-          isTaskAssignment: true
-        });
-      }
-    });
+      // Add task assignments that aren't already in project items
+      taskAssignments.forEach(task => {
+        // Check if this task is already in project items
+        const existingItem = projectItems.find(item => item.id === task.itemId);
+        
+        // If not found and it's a valid task with an itemId, add it
+        if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
+          combined.push({
+            id: task.itemId,
+            concept: task.concept || "Tarea sin nombre",
+            section: task.section || "Sin sección",
+            sectionId: task.sectionId || "",
+            completed: task.completed || false,
+            isTaskAssignment: true
+          });
+        }
+      });
+    }
     
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
@@ -175,7 +174,7 @@ const WorkHubPage: React.FC = () => {
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
-      if (!selectedAccount) {
+      if (!selectedAccount || !selectedAccount.id) {
         setProjectItems([]);
         return;
       }
@@ -183,23 +182,26 @@ const WorkHubPage: React.FC = () => {
       // Cargar los ítems seleccionados y los datos del formulario para la cuenta actual
       const selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData') || {};
-      const accountId = selectedAccount.id;
+      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
       
-      // Filtrar los ítems que pertenecen a la cuenta seleccionada
-      // En una aplicación real, esto vendría de una API con filtrado por cuenta
+      // Crear un identificador para la cuenta actual
+      const accountKey = `account-${selectedAccount.id}`;
+      
+      // Filtrar los ítems que pertenecen a la cuenta seleccionada usando el accountKey
       const items: ProjectItem[] = [];
       
       // Procesar cada sección
       Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
         data.forEach((item) => {
           // Solo incluir items reales (que comiencen con A- o B-) y que estén seleccionados
-          if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+          const itemKey = `${accountKey}-${item.id}`;
+          if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {            
             items.push({
               id: item.id,
               concept: item.concept,
               section: getSectionName(sectionId),
               sectionId: sectionId,
-              accountId: accountId // Asociar con la cuenta actual
+              completed: completedItems[item.id] || false
             });
           }
         });
@@ -207,7 +209,7 @@ const WorkHubPage: React.FC = () => {
       
       // Actualizar el estado con los ítems filtrados
       setProjectItems(items);
-      
+      console.log(`Loaded ${items.length} items for account ${selectedAccount.name}`);
     } catch (error) {
       console.error('Error loading project items:', error);
       setProjectItems([]);
@@ -413,7 +415,7 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
-    setIsLoading(true);
+    setIsLoading(true); 
     
     // Simular carga de datos
     setTimeout(() => {
@@ -421,7 +423,7 @@ const WorkHubPage: React.FC = () => {
       storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
       
       // Recargar los datos del proyecto para esta cuenta
-      loadProjectItems();
+      loadProjectItems(); 
       setIsLoading(false);
     }, 1500);
   };
@@ -906,7 +908,7 @@ const WorkHubPage: React.FC = () => {
       <SelectAccountModalForWorkHub
         isOpen={showAccountModal}
         onClose={() => setShowAccountModal(false)}
-        onSelectAccount={handleSelectAccount}
+        onSelectAccount={handleSelectAccount} 
       />
 
       <button 
