@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Tag } from 'lucide-react';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
@@ -36,8 +36,9 @@ const WorkHubPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tareas' | 'proyecto'>('tareas');
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
-  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]);
-  const [combinedItems, setCombinedItems] = useState<(ProjectItem | TaskAssignment)[]>([]);
+  const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
+  const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
+  const [sectionOrder, setSectionOrder] = useState<string[]>([]);
   const [fieldValues, setFieldValues] = useState<{[key: string]: string}>(() => {
     // Intentar cargar los valores de los campos desde localStorage
     const savedValues = storage.getItem<{[key: string]: string}>('fieldValues');
@@ -101,7 +102,7 @@ const WorkHubPage: React.FC = () => {
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
+    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems]; 
     
     // Add task assignments that aren't already in project items
     taskAssignments.forEach(task => {
@@ -121,7 +122,33 @@ const WorkHubPage: React.FC = () => {
       }
     });
     
-    setCombinedItems(combined);
+    // Group items by section
+    const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
+    
+    combined.forEach(item => {
+      const sectionId = item.sectionId || 'unknown';
+      const sectionName = getSectionNameFromId(sectionId);
+      
+      if (!grouped[sectionName]) {
+        grouped[sectionName] = [];
+      }
+      
+      grouped[sectionName].push(item);
+    });
+    
+    // Define the order of sections
+    const order = [
+      'Set Up Estrategia Digital',
+      'Estudios Antropológicos',
+      'Otros Estudios',
+      'Set Up Acompañamiento Digital',
+      'Set Up Gerencia Digital',
+      'Set Up Producción',
+      'Set up Difusión'
+    ];
+    
+    setGroupedItems(grouped);
+    setSectionOrder(order);
   }, [projectItems, taskAssignments]);
 
   // Función para cargar los ítems del proyecto desde localStorage
@@ -463,7 +490,6 @@ const WorkHubPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th>Configuración</th>
                     <th>Updates</th>
                     <th>Subele...</th>
                     <th>Fase</th>
@@ -492,274 +518,282 @@ const WorkHubPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {combinedItems.length > 0 ? (
-                    combinedItems.map((item) => (
-                      <tr key={item.id} className={item.completed ? "completed-item" : ""}>
-                        <td className="item-code-cell">
-                          <div className="item-code">{item.id}</div>
-                          <div className="item-concept-cell">{item.concept}</div>
-                        </td>
-                        <td className="item-section-cell">
-                          <div className="section-badge">
-                            <Tag size={12} className="section-icon" />
-                            <span>{getSectionNameFromId(item.sectionId)}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <button className="project-action-btn update-btn">
-                            <FileText size={16} />
-                          </button>
-                        </td>
-                        <td>
-                          <button className="project-action-btn upload-btn">
-                            <ArrowUp size={16} />
-                          </button>
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'fase')}
-                            placeholder="Fase" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Fase')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'linea_estrategica')}
-                            placeholder="Línea estratégica" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Línea estratégica')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'microcampana')}
-                            placeholder="Microcampaña" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Microcampaña')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'estatus')}
-                            placeholder="Estatus" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Estatus')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'gerente')}
-                            placeholder="Gerente" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Gerente')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'colaboradores')}
-                            placeholder="Colaboradores" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Colaboradores')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'nombre_colaborador')}
-                            placeholder="Nombre del colaborador" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Nombre del colaborador')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'perfil_colaborador')}
-                            placeholder="Perfil de colaborador" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Perfil de colaborador')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'solicitud_entrega')}
-                            placeholder="Solicitud y entrega" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Solicitud y entrega')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'semana_curso')}
-                            placeholder="Semana en curso" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Semana en curso')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'tipo_item')}
-                            placeholder="Tipo de item" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Tipo de item')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'cantidad_v')}
-                            placeholder="Cantidad V..." 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Cantidad V...', 'number')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'cantidad_pr')}
-                            placeholder="Cantidad Pr..." 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Cantidad Pr...', 'number')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'cantidad_a')}
-                            placeholder="Cantidad A..." 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Cantidad A...', 'number')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="date" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'fecha_finalizacion')}
-                            onChange={(e) => {
-                              const updatedValues = {
-                                ...fieldValues,
-                                [`${item.id}-fecha_finalizacion`]: e.target.value
-                              };
-                              setFieldValues(updatedValues);
-                              storage.setItem('fieldValues', updatedValues);
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'repositorio_co')}
-                            placeholder="Repositorio de co..." 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Repositorio de co...')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'repositorio_firma')}
-                            placeholder="Repositorio firma..." 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Repositorio firma...')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'enlace_repositorio')}
-                            placeholder="Enlace de repositorio" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Enlace de repositorio')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'desarrollo_creativo')}
-                            placeholder="Desarrollo creativo" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Desarrollo creativo')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="date" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'fecha_testeo')}
-                            onChange={(e) => {
-                              const updatedValues = {
-                                ...fieldValues,
-                                [`${item.id}-fecha_testeo`]: e.target.value
-                              };
-                              setFieldValues(updatedValues);
-                              storage.setItem('fieldValues', updatedValues);
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'estatus_testeo')}
-                            placeholder="Estatus testeo" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Estatus testeo')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'entrega_cliente')}
-                            placeholder="Entrega al cliente" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Entrega al cliente')}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="project-input" 
-                            value={getFieldValue(item.id, 'nombre_archivo')}
-                            placeholder="Nombre del archivo" 
-                            readOnly
-                            onClick={() => openModal(item.id, 'Nombre del archivo')}
-                          />
-                        </td>
-                      </tr>
-                    ))
+                  {Object.keys(groupedItems).length > 0 ? (
+                    sectionOrder.map(sectionName => {
+                      const items = groupedItems[sectionName] || [];
+                      if (items.length === 0) return null;
+                      
+                      return (
+                        <React.Fragment key={sectionName}>
+                          <tr className="section-header">
+                            <td colSpan={25} className="section-title">
+                              {sectionName}
+                            </td>
+                          </tr>
+                          {items.map((item) => (
+                            <tr key={item.id} className={item.completed ? "completed-item" : ""}>
+                              <td className="item-code-cell">
+                                <div className="item-code">{item.id}</div>
+                                <div className="item-concept-cell">{item.concept}</div>
+                              </td>
+                              <td>
+                                <button className="project-action-btn update-btn">
+                                  <FileText size={16} />
+                                </button>
+                              </td>
+                              <td>
+                                <button className="project-action-btn upload-btn">
+                                  <ArrowUp size={16} />
+                                </button>
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'fase')}
+                                  placeholder="Fase" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Fase')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'linea_estrategica')}
+                                  placeholder="Línea estratégica" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Línea estratégica')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'microcampana')}
+                                  placeholder="Microcampaña" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Microcampaña')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'estatus')}
+                                  placeholder="Estatus" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Estatus')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'gerente')}
+                                  placeholder="Gerente" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Gerente')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'colaboradores')}
+                                  placeholder="Colaboradores" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Colaboradores')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'nombre_colaborador')}
+                                  placeholder="Nombre del colaborador" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Nombre del colaborador')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'perfil_colaborador')}
+                                  placeholder="Perfil de colaborador" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Perfil de colaborador')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'solicitud_entrega')}
+                                  placeholder="Solicitud y entrega" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Solicitud y entrega')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'semana_curso')}
+                                  placeholder="Semana en curso" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Semana en curso')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'tipo_item')}
+                                  placeholder="Tipo de item" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Tipo de item')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'cantidad_v')}
+                                  placeholder="Cantidad V..." 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Cantidad V...', 'number')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'cantidad_pr')}
+                                  placeholder="Cantidad Pr..." 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Cantidad Pr...', 'number')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'cantidad_a')}
+                                  placeholder="Cantidad A..." 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Cantidad A...', 'number')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="date" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'fecha_finalizacion')}
+                                  onChange={(e) => {
+                                    const updatedValues = {
+                                      ...fieldValues,
+                                      [`${item.id}-fecha_finalizacion`]: e.target.value
+                                    };
+                                    setFieldValues(updatedValues);
+                                    storage.setItem('fieldValues', updatedValues);
+                                  }}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'repositorio_co')}
+                                  placeholder="Repositorio de co..." 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Repositorio de co...')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'repositorio_firma')}
+                                  placeholder="Repositorio firma..." 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Repositorio firma...')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'enlace_repositorio')}
+                                  placeholder="Enlace de repositorio" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Enlace de repositorio')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'desarrollo_creativo')}
+                                  placeholder="Desarrollo creativo" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Desarrollo creativo')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="date" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'fecha_testeo')}
+                                  onChange={(e) => {
+                                    const updatedValues = {
+                                      ...fieldValues,
+                                      [`${item.id}-fecha_testeo`]: e.target.value
+                                    };
+                                    setFieldValues(updatedValues);
+                                    storage.setItem('fieldValues', updatedValues);
+                                  }}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'estatus_testeo')}
+                                  placeholder="Estatus testeo" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Estatus testeo')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'entrega_cliente')}
+                                  placeholder="Entrega al cliente" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Entrega al cliente')}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  className="project-input" 
+                                  value={getFieldValue(item.id, 'nombre_archivo')}
+                                  placeholder="Nombre del archivo" 
+                                  readOnly
+                                  onClick={() => openModal(item.id, 'Nombre del archivo')}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
+                      );
+                    })
                   ) : (
                     <tr style={{ height: '300px' }}>
-                      <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                      <td colSpan={25} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                         <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
                           <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                           <h3>No hay ítems de proyecto</h3>

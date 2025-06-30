@@ -839,69 +839,6 @@
   color: #1a202c;
 }
 
-/* Item section cell */
-.item-section-cell {
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-align: center;
-  transition: color 0.3s ease;
-}
-
-/* Dark theme item section */
-.workhub-page.dark-theme .item-section-cell {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* Light theme item section */
-.workhub-page.light-theme .item-section-cell {
-  color: #4a5568;
-}
-
-/* Section badge */
-.section-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  max-width: 100%;
-  white-space: normal;
-  word-break: break-word;
-  line-height: 1.2;
-  text-align: left;
-}
-
-/* Dark theme section badge */
-.workhub-page.dark-theme .section-badge {
-  background: rgba(147, 112, 219, 0.15);
-  color: rgba(147, 112, 219, 0.9);
-  border: 1px solid rgba(147, 112, 219, 0.25);
-}
-
-/* Light theme section badge */
-.workhub-page.light-theme .section-badge {
-  background: rgba(1, 113, 226, 0.08);
-  color: #0171E2;
-  border: 1px solid rgba(1, 113, 226, 0.15);
-}
-
-.section-icon {
-  flex-shrink: 0;
-}
-
-/* Dark theme section icon */
-.workhub-page.dark-theme .section-icon {
-  color: rgba(147, 112, 219, 1);
-}
-
-/* Light theme section icon */
-.workhub-page.light-theme .section-icon {
-  color: #0171E2;
-}
-
 /* Item status cell */
 .item-status-cell {
   text-align: center;
@@ -970,6 +907,136 @@
 /* Light theme completed item */
 .workhub-page.light-theme .completed-item {
   background: rgba(34, 197, 94, 0.04);
+}
+
+/* Section header styles for project table */
+.project-table .section-header {
+  transition: all 0.3s ease;
+}
+
+/* Dark theme section header */
+.workhub-page.dark-theme .project-table .section-header {
+  background: rgba(147, 112, 219, 0.2) !important;
+}
+
+/* Light theme section header */
+.workhub-page.light-theme .project-table .section-header {
+  background: rgba(1, 113, 226, 0.1) !important;
+}
+
+.project-table .section-title {
+  font-size: 1.2rem !important;
+  font-weight: 600;
+  padding: 1.2rem 0.8rem !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  opacity: 0.92;
+  text-align: left !important;
+  transition: all 0.3s ease;
+  line-height: 1.6 !important;
+  min-height: 5rem !important;
+  display: table-cell !important;
+  vertical-align: middle !important;
+}
+
+/* Dark theme section title */
+.workhub-page.dark-theme .project-table .section-title {
+  color: white !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.55) 0%, 
+    rgba(26, 11, 46, 0.6) 25%, 
+    rgba(88, 51, 139, 0.5) 50%, 
+    rgba(147, 112, 219, 0.45) 75%, 
+    rgba(88, 51, 139, 0.5) 100%
+  ) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Light theme section title */
+.workhub-page.light-theme .project-table .section-title {
+  color: #1a202c !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;
+  background: linear-gradient(135deg, 
+    rgba(248, 250, 252, 0.9) 0%, 
+    rgba(241, 245, 249, 0.95) 25%, 
+    rgba(226, 232, 240, 0.9) 50%, 
+    rgba(203, 213, 225, 0.85) 75%, 
+    rgba(226, 232, 240, 0.9) 100%
+  ) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  text-shadow: none !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.project-table .section-title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px !important;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme section title before */
+.workhub-page.dark-theme .project-table .section-title::before {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(147, 112, 219, 0.35) 50%, 
+    transparent 100%
+  );
+}
+
+/* Light theme section title before */
+.workhub-page.light-theme .project-table .section-title::before {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(1, 113, 226, 0.3) 50%, 
+    transparent 100%
+  );
+}
+
+.project-table .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px !important;
+  transition: all 0.3s ease;
+}
+
+/* Dark theme section title after */
+.workhub-page.dark-theme .project-table .section-title::after {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 0, 0, 0.25) 50%, 
+    transparent 100%
+  );
+}
+
+/* Light theme section title after */
+.workhub-page.light-theme .project-table .section-title::after {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 0, 0, 0.15) 50%, 
+    transparent 100%
+  );
 }
 
 .project-table-container::-webkit-scrollbar {
