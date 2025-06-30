@@ -874,14 +874,10 @@ const WorkHubPage: React.FC = () => {
                           <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem' }}>
                             <Briefcase size={48} style={{ marginBottom: '1.5rem', opacity: 0.7 }} />
                             <h3 style={{ marginBottom: '1rem' }}>
-                              {selectedAccount 
-                                ? 'No hay ítems para esta cuenta' 
-                                : 'Selecciona una cuenta para ver los proyectos'}
+                              Selecciona una cuenta para ver los proyectos
                             </h3>
                             <p style={{ maxWidth: '300px', margin: '0 auto' }}>
-                              {selectedAccount 
-                                ? 'Esta cuenta no tiene ítems configurados en el acuerdo de colaboración. Por favor configura los ítems desde la sección EHO.' 
-                                : 'Haz clic en "Seleccionar cuenta" en la parte superior derecha para comenzar a trabajar con un proyecto.'}
+                              Haz clic en "Seleccionar cuenta" en la parte superior derecha para comenzar a trabajar con un proyecto.
                             </p>
                           </div> 
                         </td>
