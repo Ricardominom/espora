@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { X, Users, CheckCircle } from 'lucide-react';
 import '../styles/modal.css';
 
-
 interface Account {
   id: number;
   name: string;
@@ -26,10 +25,11 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>(currentAccountId?.toString() || "");
 
-  // Reset selected account when modal opens
   useEffect(() => {
-    if (isOpen) {
-      // Fetch active accounts
+    // Fetch active accounts
+    const fetchAccounts = () => {
+      // In a real app, this would be an API call
+      // For now, we'll use mock data
       const mockAccounts: Account[] = [
         { id: 1, name: 'Juan Pérez', position: 'Alcalde', isActive: true },
         { id: 2, name: 'María García', position: 'Gobernadora', isActive: true },
@@ -40,14 +40,13 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
       // Filter only active accounts
       const activeAccounts = mockAccounts.filter(account => account.isActive);
       setAccounts(activeAccounts);
-      
-      // Reset selected account ID
-      setSelectedAccountId(currentAccountId ? currentAccountId.toString() : "");
-      
-      // Clear any previous data
-      localStorage.removeItem('filteredProjectItems');
+    };
+    
+    if (isOpen) {
+      fetchAccounts();
+      setSelectedAccountId(currentAccountId?.toString() || "");
     }
-  }, [isOpen, currentAccountId]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -60,9 +59,6 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedAccountId) {
-      // Clear any previous data before selecting a new account
-      localStorage.removeItem('filteredProjectItems');
-      
       const accountId = parseInt(selectedAccountId);
       const account = accounts.find(acc => acc.id === accountId);
       if (account) {
@@ -108,7 +104,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
               ))}
             </select>
           </div>
-          
+
           <div className="modal-footer">
             <button type="button" onClick={onClose} className="cancel-button">
               Cancelar
