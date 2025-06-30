@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users } from 'lucide-react';
+import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { hasPermission, getUserById } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
@@ -8,6 +8,7 @@ import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
 import InputModal from '../components/InputModal';
 import SelectAccountModalForWorkHub from '../components/SelectAccountModalForWorkHub';
+import AccountBadge from '../components/AccountBadge';
 import '../styles/workhub.css';
 
 interface TaskAssignment {
@@ -36,7 +37,11 @@ const WorkHubPage: React.FC = () => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'tareas' | 'proyecto'>('tareas');
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
+    // Intentar cargar la cuenta seleccionada desde localStorage
+    const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
+    return savedAccount;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
@@ -386,6 +391,10 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
+    
+    // Guardar la cuenta seleccionada en localStorage
+    storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
+    
     setIsLoading(true);
     
     // Simular carga de datos
@@ -411,7 +420,7 @@ const WorkHubPage: React.FC = () => {
         </div>
         
         <h1 className="workhub-title">
-          WORKHUB
+          WORKHUB {selectedAccount && activeTab === 'proyecto' && <AccountBadge accountName={selectedAccount.name} />}
         </h1>
         
         <div className="header-right">
@@ -439,7 +448,7 @@ const WorkHubPage: React.FC = () => {
               })
             }}
           > 
-            <Users size={16} />
+            <Users size={16} style={{ flexShrink: 0 }} />
             <span>Seleccionar cuenta</span>
           </button>}
         </div>
@@ -507,7 +516,7 @@ const WorkHubPage: React.FC = () => {
                     <div className="task-card-content">
                       <h3 className="task-card-title">{task.concept || task.itemId || "Tarea sin nombre"}</h3>
                       <div className="task-card-footer">
-                        <div className="task-card-code">{task.itemId || task.code}</div>
+                        <div className="task-card-code">{task.itemId || task.code || "Sin código"}</div>
                         {task.completed && (
                           <div className="task-completed-badge">
                             <CheckCircle size={16} />
@@ -540,7 +549,7 @@ const WorkHubPage: React.FC = () => {
                   <thead>
                     <tr>
                       <th>Item</th>
-                      <th>Updates</th>
+                      <th>Estado</th>
                       <th>Subele...</th>
                       <th>Fase</th>
                       <th>Línea estratégica</th>
@@ -587,7 +596,13 @@ const WorkHubPage: React.FC = () => {
                                   <div className="item-concept-cell">{item.concept}</div>
                                 </td>
                                 <td>
-                                  <button className="project-action-btn update-btn">
+                                  <div className="item-status-cell">
+                                    {item.completed ? (
+                                      <span className="status-completed"><CheckCircle size={14} /> Completado</span>
+                                    ) : (
+                                      <span className="status-pending"><Clock4 size={14} /> Pendiente</span>
+                                    )}
+                                  </div>
                                     <FileText size={16} />
                                   </button>
                                 </td>
@@ -848,7 +863,7 @@ const WorkHubPage: React.FC = () => {
                             <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                             <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta'}</h3>
                             <p>{selectedAccount ? 'Esta cuenta no tiene ítems en el acuerdo de colaboración' : 'Haz clic en "Seleccionar cuenta" para ver los proyectos'}</p>
-                          </div>
+                          </div> 
                         </td>
                       </tr>
                     )}

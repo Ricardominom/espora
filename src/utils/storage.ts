@@ -129,6 +129,25 @@ export const storage = {
     }
   },
 
+  // Guardar cuenta seleccionada en WorkHub
+  saveSelectedWorkHubAccount: (account: {id: number, name: string}) => {
+    try {
+      storage.setItem('selectedWorkHubAccount', account);
+    } catch (error) {
+      console.error('Error saving selected WorkHub account:', error);
+    }
+  },
+
+  // Cargar cuenta seleccionada en WorkHub
+  getSelectedWorkHubAccount: () => {
+    try {
+      return storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
+    } catch (error) {
+      console.error('Error loading selected WorkHub account:', error);
+      return null;
+    }
+  },
+
   // Obtener todas las claves
   getAllKeys: (): string[] => {
     const keys: string[] = [];

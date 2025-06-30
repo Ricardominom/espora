@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Users } from 'lucide-react';
+import { X, Users, CheckCircle } from 'lucide-react';
 import '../styles/modal.css';
 
 interface Account {
@@ -13,15 +13,17 @@ interface SelectAccountModalForWorkHubProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectAccount: (accountId: number, accountName: string) => void;
+  currentAccountId?: number;
 }
 
 const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> = ({ 
   isOpen, 
   onClose, 
-  onSelectAccount 
+  onSelectAccount,
+  currentAccountId
 }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
+  const [selectedAccountId, setSelectedAccountId] = useState<string>(currentAccountId?.toString() || "");
 
   useEffect(() => {
     // Fetch active accounts
@@ -42,7 +44,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
     
     if (isOpen) {
       fetchAccounts();
-      setSelectedAccountId("");
+      setSelectedAccountId(currentAccountId?.toString() || "");
     }
   }, [isOpen]);
 
@@ -79,7 +81,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
+        <form onSubmit={handleSubmit} className="modal-form" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
           <div className="form-group" style={{ gridColumn: 'span 2' }}>
             <label htmlFor="accountSelect">Selecciona una cuenta</label>
             <select
@@ -97,7 +99,20 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
               <option value="" disabled>Elige una cuenta...</option>
               {accounts.map(account => (
                 <option key={account.id} value={account.id}>
-                  {account.name} - {account.position}
+                  {account.name} - {account.position} {account.id === currentAccountId ? '(Actual)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <label>Cuentas disponibles</label>
+            <div className="accounts-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {accounts.map(account => (
+                <option key={account.id} value={account.id} onClick={() => setSelectedAccountId(account.id.toString())} style={{ 
+                  padding: '0.75rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid rgba(0,0,0,0.1)', background: account.id === parseInt(selectedAccountId) ? 'rgba(59, 130, 246, 0.1)' : 'transparent' 
+                }}>
+                  {account.name} - {account.position} {account.id === currentAccountId && <CheckCircle size={16} style={{ display: 'inline', marginLeft: '0.5rem', color: 'green' }}/>}
                 </option>
               ))}
             </select>
