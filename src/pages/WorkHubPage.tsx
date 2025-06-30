@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, CheckSquare, Clock, AlertCircle, CheckCircle, FileText, ArrowUp, Layers, Briefcase, Users, Clock4 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { hasPermission, getUserById } from '../data/users';
+import { hasPermission } from '../data/users';
 import LogoutDialog from '../components/LogoutDialog';
 import MenuBackground from '../components/MenuBackground';
 import { storage } from '../utils/storage';
@@ -40,10 +40,11 @@ const WorkHubPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
     // Intentar cargar la cuenta seleccionada desde localStorage
     const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
-    return savedAccount || null;
+    return savedAccount;
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
+  const [allProjectItems, setAllProjectItems] = useState<ProjectItem[]>([]);
+  const [filteredProjectItems, setFilteredProjectItems] = useState<ProjectItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('today');
   const [taskAssignments, setTaskAssignments] = useState<TaskAssignment[]>([]); 
   const [groupedItems, setGroupedItems] = useState<{[key: string]: (ProjectItem | TaskAssignment)[]}>({}); 
@@ -106,24 +107,32 @@ const WorkHubPage: React.FC = () => {
     // Cargar tareas inicialmente
     loadTasks();
     loadProjectItems();
-  }, [user]);
+  }, [user, selectedAccount?.id]);
+
+  // Filtrar los items del proyecto cuando cambia la cuenta seleccionada
+  useEffect(() => {
+    if (selectedAccount) {
+      // Filtrar los items para la cuenta seleccionada
+      // En una aplicación real, esto se haría con una llamada a la API
+      // Por ahora, simulamos que todos los items pertenecen a la cuenta seleccionada
+      setFilteredProjectItems(allProjectItems);
+      console.log(`Filtrando items para la cuenta: ${selectedAccount.name} (ID: ${selectedAccount.id})`);
+    } else {
+      // Si no hay cuenta seleccionada, no mostrar ningún item
+      setFilteredProjectItems([]);
+    }
+  }, [allProjectItems, selectedAccount]);
 
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    if (!selectedAccount) {
-      // Si no hay cuenta seleccionada, no hay nada que combinar
-      setGroupedItems({});
-      setSectionOrder([]);
-      return;
-    }
-    
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
+    // Crear una lista combinada de items filtrados y asignaciones de tareas
+    const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems];
     
     // Add task assignments that aren't already in project items
     taskAssignments.forEach(task => {
       // Check if this task is already in project items
-      const existingItem = projectItems.find(item => item.id === task.itemId);
+      const existingItem = filteredProjectItems.find(item => item.id === task.itemId);
       
       // If not found and it's a valid task with an itemId, add it
       if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
@@ -165,7 +174,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [projectItems, taskAssignments, selectedAccount]);
+  }, [filteredProjectItems, taskAssignments]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
@@ -192,7 +201,7 @@ const WorkHubPage: React.FC = () => {
           });
         });
         
-        setProjectItems(items);
+        setAllProjectItems(items);
       }
     } catch (error) {
       console.error('Error loading project items:', error);
@@ -399,7 +408,7 @@ const WorkHubPage: React.FC = () => {
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
     
-    setIsLoading(true);
+    setIsLoading(true); 
     
     // Simular carga de datos
     setTimeout(() => {
@@ -407,7 +416,7 @@ const WorkHubPage: React.FC = () => {
       storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
       
       // Recargar los datos del proyecto para esta cuenta específica
-      loadProjectItems();
+      loadProjectItems(); // Esto recargará todos los items y luego el useEffect los filtrará
       
       setIsLoading(false);
     }, 1500);
@@ -557,7 +566,7 @@ const WorkHubPage: React.FC = () => {
                 <table className="project-table">
                   <thead>
                     <tr>
-                      <th>Item</th>
+                      <th>Código</th>
                       <th>Subele...</th>
                       <th>Fase</th>
                       <th>Línea estratégica</th>
@@ -567,7 +576,6 @@ const WorkHubPage: React.FC = () => {
                       <th>Colaboradores</th>
                       <th>Nombre del colaborador</th>
                       <th>Perfil de colaborador</th>
-                      <th>Solicitud y entrega</th>
                       <th>Semana en curso</th>
                       <th>Tipo de item</th>
                       <th>Cantidad V...</th>
@@ -585,7 +593,7 @@ const WorkHubPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedAccount && Object.keys(groupedItems).length > 0 ? (
+                    {selectedAccount && filteredProjectItems.length > 0 ? (
                       sectionOrder.map(sectionName => {
                         const items = groupedItems[sectionName] || [];
                         if (items.length === 0) return null; // No mostrar secciones vacías
@@ -595,7 +603,7 @@ const WorkHubPage: React.FC = () => {
                             <tr className="section-header">
                               <td colSpan={26} className="section-title">
                                 {sectionName}
-                              </td>
+                              </td> 
                             </tr>
                             {items.map((item) => (
                               <tr key={item.id} className={item.completed ? "completed-item" : ""}>
@@ -686,16 +694,6 @@ const WorkHubPage: React.FC = () => {
                                     placeholder="Perfil de colaborador" 
                                     readOnly
                                     onClick={() => openModal(item.id, 'Perfil de colaborador')}
-                                  />
-                                </td>
-                                <td>
-                                  <input 
-                                    type="text" 
-                                    className="project-input" 
-                                    value={getFieldValue(item.id, 'solicitud_entrega')}
-                                    placeholder="Solicitud y entrega" 
-                                    readOnly
-                                    onClick={() => openModal(item.id, 'Solicitud y entrega')}
                                   />
                                 </td>
                                 <td>
@@ -857,7 +855,7 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                           <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem' }}>
-                            <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                            <Briefcase size={64} style={{ marginBottom: '1.5rem' }} />
                             <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta para ver los proyectos'}</h3>
                             <p>{selectedAccount 
                               ? 'Esta cuenta no tiene ítems configurados en el acuerdo de colaboración' 

@@ -1,29 +1,28 @@
 .checklist-captura-page {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden; 
-  overflow-y: scroll; /* Ensure vertical scroll is always available */
+  overflow-x: hidden;
+  overflow-y: auto; /* Cambiado a auto para que el scroll aparezca solo cuando sea necesario */
   display: flex;
   flex-direction: column;
   padding: 0.3rem;
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   scrollbar-width: thin;
   -ms-overflow-style: auto;
-  /* Asegurar que el fondo cubra toda la pantalla */
   width: 100vw;
-  min-height: 100vh; /* Permitir que crezca más allá de la pantalla */
-  max-height: none; /* Remove max-height restriction */
+  min-height: 100vh;
+  max-height: none;
 }
 
 /* Habilitar scroll visible en toda la página */
 .checklist-captura-page::-webkit-scrollbar {
-  width: 14px; /* Slightly wider scrollbar for better usability */
-  display: block; /* Ensure scrollbar is always visible */
+  width: 14px;
+  display: block;
 }
 
 .checklist-captura-page::-webkit-scrollbar-track {
   border-radius: 6px;
-  margin: 4px 0; /* Add some margin for better appearance */
+  margin: 4px 0;
 }
 
 /* Dark theme page scrollbar */
