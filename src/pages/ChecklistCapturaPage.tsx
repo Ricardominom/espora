@@ -428,7 +428,7 @@ const ChecklistCapturaPage: React.FC = () => {
           const newAssignment = {
             itemId, 
             userId, 
-            concept: item.concept,
+            concept: item.concept, 
             section: item.section,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',

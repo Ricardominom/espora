@@ -90,56 +90,53 @@ const WorkHubPage: React.FC = () => {
   // Effect to filter project items based on selected account
   useEffect(() => {
     if (!selectedAccount) {
-      setFilteredProjectItems([]); 
-      setGroupedItems({});
+      setFilteredProjectItems([]);
       return;
     }
 
     // Get client name from selected account
     const clientName = selectedAccount.name.split(' - ')[0];
     
-    try {
-      // Load all task assignments
-      const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
+    // Filter task assignments based on the selected client
+    const filteredTasks = taskAssignments.filter(task => 
+      task.clientName === clientName
+    );
+    setTaskAssignments(filteredTasks);
+
+    // Load client-specific data from localStorage
+    const clientData = storage.getItem<{
+      selectedItems: {[key: string]: boolean},
+      formData: {[key: string]: any[]},
+      completedItems: {[key: string]: boolean}
+    }>(`client_${clientName}_data`);
+
+    if (clientData) {
+      // Use client-specific data if available
+      const items: ProjectItem[] = [];
       
-      // Filter for current user and selected client
-      const clientTasks = savedAssignments.filter(task => 
-        task.clientName === clientName && task.userId === user?.id
-      );
-      
-      setTaskAssignments(clientTasks);
-      
-      // Load selected items and form data
-      const selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
-      const formData = storage.getItem<{[key: string]: any[]}>('formData');
-      const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
-      
-      if (formData) {
-        const items: ProjectItem[] = [];
-        
-        // Process each section
-        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+      if (clientData.formData) {
+        Object.entries(clientData.formData).forEach(([sectionId, data]: [string, any[]]) => {
           data.forEach((item) => {
-            // Only include selected items
-            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+            if (clientData.selectedItems && clientData.selectedItems[item.id]) {
               items.push({
                 id: item.id,
                 concept: item.concept,
                 section: getSectionName(sectionId),
                 sectionId: sectionId,
-                completed: completedItems[item.id] || false
+                completed: clientData.completedItems ? clientData.completedItems[item.id] : false
               });
             }
           });
         });
-        
-        setFilteredProjectItems(items);
       }
-    } catch (error) {
-      console.error('Error loading project data:', error);
+      
+      setFilteredProjectItems(items);
+    } else {
+      // Filter project items based on the selected account
+      // This is a fallback if client-specific data isn't available
+      // In a real app, you would fetch data for the specific account from the server
       setFilteredProjectItems([]);
     }
-
   }, [selectedAccount]);
 
   // Combine filtered project items and task assignments for the project tab
@@ -885,18 +882,8 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message">
                           {!selectedAccount ? (
-                            <div className="empty-project-content">
-                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                              <h3>Selecciona una cuenta</h3>
-                              <p>Haz clic en "Seleccionar cuenta" para ver los proyectos</p>
-                            </div>
-                          ) : Object.keys(groupedItems).length === 0 ? (
-                            <div className="empty-project-content">
-                              <Layers size={48} style={{ marginBottom: '1rem' }} />
-                              <h3>No hay datos para esta cuenta</h3>
-                              <p>Esta cuenta no tiene elementos en el acuerdo de colaboración</p>
-                            </div>
-                          ) : null}
+                            null
+                          ) : <div className="empty-project-content"><p>No hay datos para esta cuenta</p></div>}
                         </td>
                       </tr>
                     )}
