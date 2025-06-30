@@ -112,11 +112,16 @@ const WorkHubPage: React.FC = () => {
   // Filtrar los items del proyecto cuando cambia la cuenta seleccionada
   useEffect(() => {
     if (selectedAccount) {
-      // Filtrar los items para la cuenta seleccionada
-      // En una aplicación real, esto se haría con una llamada a la API
-      // Por ahora, simulamos que todos los items pertenecen a la cuenta seleccionada
-      setFilteredProjectItems(allProjectItems);
-      console.log(`Filtrando items para la cuenta: ${selectedAccount.name} (ID: ${selectedAccount.id})`);
+      // Simulamos que solo las cuentas con ID 1 y 2 tienen ítems
+      // En una aplicación real, esto vendría de una API
+      if (selectedAccount.id === 1 || selectedAccount.id === 2) {
+        setFilteredProjectItems(allProjectItems);
+        console.log(`Cuenta con ítems: ${selectedAccount.name} (ID: ${selectedAccount.id})`);
+      } else {
+        // Para las demás cuentas, no mostramos ítems
+        setFilteredProjectItems([]);
+        console.log(`Cuenta sin ítems: ${selectedAccount.name} (ID: ${selectedAccount.id})`);
+      }
     } else {
       // Si no hay cuenta seleccionada, no mostrar ningún item
       setFilteredProjectItems([]);
@@ -593,7 +598,7 @@ const WorkHubPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedAccount && filteredProjectItems.length > 0 ? (
+                    {selectedAccount && filteredProjectItems && filteredProjectItems.length > 0 ? (
                       sectionOrder.map(sectionName => {
                         const items = groupedItems[sectionName] || [];
                         if (items.length === 0) return null; // No mostrar secciones vacías
