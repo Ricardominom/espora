@@ -596,18 +596,6 @@ const WorkHubPage: React.FC = () => {
                                   <div className="item-concept-cell">{item.concept}</div>
                                 </td>
                                 <td>
-                                  <div className="item-status-cell">
-                                    {item.completed ? (
-                                      <span className="status-completed"><CheckCircle size={14} /> Completado</span>
-                                    ) : (
-                                      <span className="status-pending"><Clock4 size={14} /> Pendiente</span>
-                                    )}
-                                  </div>
-                                  <button className="project-action-btn update-btn">
-                                    <FileText size={16} />
-                                  </button>
-                                </td>
-                                <td>
                                   <button className="project-action-btn upload-btn">
                                     <ArrowUp size={16} />
                                   </button>
