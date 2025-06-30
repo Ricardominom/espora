@@ -91,9 +91,9 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
               value={selectedAccountId}
               onChange={(e) => setSelectedAccountId(e.target.value)}
               style={{ 
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.75rem center',
-                backgroundSize: '16px'
+                backgroundRepeat: 'no-repeat', 
+                backgroundPosition: 'right 0.75rem center', 
+                backgroundSize: '16px' 
               }}
             >
               <option value="" disabled>Elige una cuenta...</option>
@@ -103,7 +103,6 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
                 </option>
               ))}
             </select>
-          </div>
 
           <div className="modal-footer">
             <button type="button" onClick={onClose} className="cancel-button">

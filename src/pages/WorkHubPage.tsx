@@ -40,7 +40,7 @@ const WorkHubPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
     // Intentar cargar la cuenta seleccionada desde localStorage
     const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
-    return savedAccount;
+    return savedAccount || null;
   });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
@@ -111,7 +111,14 @@ const WorkHubPage: React.FC = () => {
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems]; 
+    if (!selectedAccount) {
+      // Si no hay cuenta seleccionada, no hay nada que combinar
+      setGroupedItems({});
+      setSectionOrder([]);
+      return;
+    }
+    
+    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
     
     // Add task assignments that aren't already in project items
     taskAssignments.forEach(task => {
@@ -158,7 +165,7 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [projectItems, taskAssignments]);
+  }, [projectItems, taskAssignments, selectedAccount]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
@@ -392,14 +399,16 @@ const WorkHubPage: React.FC = () => {
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
     
-    // Guardar la cuenta seleccionada en localStorage
-    storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
-    
     setIsLoading(true);
     
     // Simular carga de datos
     setTimeout(() => {
-      // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
+      // Guardar la cuenta seleccionada en localStorage después de cargar
+      storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
+      
+      // Recargar los datos del proyecto para esta cuenta específica
+      loadProjectItems();
+      
       setIsLoading(false);
     }, 1500);
   };
@@ -579,7 +588,7 @@ const WorkHubPage: React.FC = () => {
                     {selectedAccount && Object.keys(groupedItems).length > 0 ? (
                       sectionOrder.map(sectionName => {
                         const items = groupedItems[sectionName] || [];
-                        if (items.length === 0) return null;
+                        if (items.length === 0) return null; // No mostrar secciones vacías
                         
                         return (
                           <React.Fragment key={sectionName}>
@@ -847,10 +856,12 @@ const WorkHubPage: React.FC = () => {
                     ) : (
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
-                          <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
+                          <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem' }}>
                             <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                            <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta'}</h3>
-                            <p>{selectedAccount ? 'Esta cuenta no tiene ítems en el acuerdo de colaboración' : 'Haz clic en "Seleccionar cuenta" para ver los proyectos'}</p>
+                            <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta para ver los proyectos'}</h3>
+                            <p>{selectedAccount 
+                              ? 'Esta cuenta no tiene ítems configurados en el acuerdo de colaboración' 
+                              : 'Haz clic en "Seleccionar cuenta" en la parte superior derecha para comenzar'}</p>
                           </div> 
                         </td>
                       </tr>
