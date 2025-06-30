@@ -572,31 +572,31 @@ const WorkHubPage: React.FC = () => {
                 <table className="project-table" style={{ tableLayout: 'fixed' }}>
                   <thead>
                     <tr>
-                      <th>Item</th>
-                      <th>Subele...</th>
-                      <th>Fase</th>
-                      <th>Línea estratégica</th>
-                      <th>Microcampaña</th>
-                      <th>Estatus</th>
-                      <th>Gerente</th>
-                      <th>Colaboradores</th>
-                      <th>Nombre del colaborador</th>
-                      <th>Perfil de colaborador</th>
-                      <th>Solicitud y entrega</th>
-                      <th>Semana en curso</th>
-                      <th>Tipo de item</th>
-                      <th>Cantidad V...</th>
-                      <th>Cantidad Pr...</th>
-                      <th>Cantidad A...</th>
-                      <th>Fecha de finalización</th>
-                      <th>Repositorio de co...</th>
-                      <th>Repositorio firma...</th>
-                      <th>Enlace de repositorio</th>
-                      <th>Desarrollo creativo</th>
-                      <th>Fecha testeo</th>
-                      <th>Estatus testeo</th>
-                      <th>Entrega al cliente</th>
-                      <th>Nombre del archivo</th>
+                      <th style={{ width: '200px', minWidth: '200px' }}>Item</th>
+                      <th style={{ width: '80px', minWidth: '80px' }}>Subele...</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Fase</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Línea estratégica</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Microcampaña</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Estatus</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Gerente</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Colaboradores</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Nombre del colaborador</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Perfil de colaborador</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Solicitud y entrega</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Semana en curso</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Tipo de item</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Cantidad V...</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Cantidad Pr...</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Cantidad A...</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Fecha de finalización</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Repositorio de co...</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Repositorio firma...</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Enlace de repositorio</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Desarrollo creativo</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Fecha testeo</th>
+                      <th style={{ width: '120px', minWidth: '120px' }}>Estatus testeo</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Entrega al cliente</th>
+                      <th style={{ width: '150px', minWidth: '150px' }}>Nombre del archivo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -871,7 +871,7 @@ const WorkHubPage: React.FC = () => {
                     ) : (
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
-                        </td>
+                        </td> 
                       </tr>
                     )}
                   </tbody>
@@ -882,62 +882,4 @@ const WorkHubPage: React.FC = () => {
         )}
       </div>
 
-      <InputModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onSave={modalState.onSave}
-        initialValue={modalState.initialValue}
-        fieldName={modalState.fieldName}
-        fieldType={modalState.fieldType}
-        selectOptions={modalState.selectOptions}
-      />
-
-      <SelectAccountModalForWorkHub
-        isOpen={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
-        onSelectAccount={handleSelectAccount} 
-      />
-
-      <button 
-        className="logout-button"
-        onClick={() => setShowLogoutDialog(true)}
-        style={{
-          position: 'fixed',
-          bottom: '2rem',
-          right: '2rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.5rem 1rem',
-          border: 'none',
-          borderRadius: '20px',
-          fontSize: '0.875rem',
-          cursor: 'pointer',
-          zIndex: 10,
-          backdropFilter: 'blur(10px)',
-          transition: 'all 0.2s ease',
-          ...(isDarkMode ? {
-            background: 'rgba(59, 130, 246, 0.15)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            color: 'rgba(255, 255, 255, 0.7)'
-          } : {
-            background: 'rgba(253, 253, 254, 0.95)',
-            color: '#0171E2',
-            border: '2px solid #0171E2',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
-          })
-        }}
-      >
-        <LogOut size={16} />
-        <span>Cerrar sesión</span>
-      </button>
-
-      <LogoutDialog
-        isOpen={showLogoutDialog}
-        onClose={() => setShowLogoutDialog(false)}
-      />
-    </div>
-  );
-};
-
-export default WorkHubPage;
+      
