@@ -784,8 +784,20 @@
 /* Item code cell */
 .item-code-cell {
   font-weight: 600;
+  font-size: 0.75rem;
+  text-align: left;
+  transition: color 0.3s ease;
+  padding: 0.5rem 0.75rem;
+  min-width: 200px;
+  max-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item-code {
+  font-weight: 700;
   font-size: 0.8rem;
-  text-align: center;
   transition: color 0.3s ease;
 }
 
@@ -794,8 +806,16 @@
   color: rgba(147, 112, 219, 0.9);
 }
 
+.workhub-page.dark-theme .item-code {
+  color: rgba(147, 112, 219, 1);
+}
+
 /* Light theme item code */
 .workhub-page.light-theme .item-code-cell {
+  color: #0171E2;
+}
+
+.workhub-page.light-theme .item-code {
   color: #0171E2;
 }
 
@@ -803,11 +823,10 @@
 .item-concept-cell {
   font-weight: 500;
   font-size: 0.75rem;
-  max-width: 200px;
   word-wrap: break-word;
   line-height: 1.3;
   transition: color 0.3s ease;
-  padding: 0.5rem 0.75rem;
+  padding: 0;
 }
 
 /* Dark theme item concept */
