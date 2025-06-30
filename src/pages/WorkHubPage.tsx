@@ -82,8 +82,8 @@ const WorkHubPage: React.FC = () => {
   useEffect(() => {
     setIsVisible(true);
 
-    // Función para cargar las tareas
-    const loadTasks = () => {
+    const loadData = () => {
+      // Cargar tareas
       try {
         // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
         let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
@@ -100,13 +100,18 @@ const WorkHubPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error loading task assignments:', error);
+        setTaskAssignments([]);
+      }
+      
+      // Cargar ítems del proyecto si hay una cuenta seleccionada
+      if (selectedAccount) {
+        loadProjectItems();
       }
     };
     
-    // Cargar tareas inicialmente
-    loadTasks();
-    loadProjectItems();
-  }, [user]);
+    // Cargar datos inicialmente
+    loadData();
+  }, [user, selectedAccount]);
 
   // Combine project items and task assignments for the project tab
   useEffect(() => {
@@ -170,32 +175,42 @@ const WorkHubPage: React.FC = () => {
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
-      // Cargar los ítems seleccionados y los datos del formulario
-      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
-      const formData = storage.getItem<{[key: string]: any[]}>('formData');
-      
-      if (formData) {
-        const items: ProjectItem[] = [];
-        
-        // Procesar cada sección
-        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
-          data.forEach((item) => {
-            // Solo incluir items reales (que comiencen con A- o B-)
-            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-              items.push({
-                id: item.id,
-                concept: item.concept,
-                section: getSectionName(sectionId),
-                sectionId: sectionId
-              });
-            }
-          });
-        });
-        
-        setProjectItems(items);
+      if (!selectedAccount) {
+        setProjectItems([]);
+        return;
       }
+      
+      // Cargar los ítems seleccionados y los datos del formulario para la cuenta actual
+      const selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      const formData = storage.getItem<{[key: string]: any[]}>('formData') || {};
+      const accountId = selectedAccount.id;
+      
+      // Filtrar los ítems que pertenecen a la cuenta seleccionada
+      // En una aplicación real, esto vendría de una API con filtrado por cuenta
+      const items: ProjectItem[] = [];
+      
+      // Procesar cada sección
+      Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+        data.forEach((item) => {
+          // Solo incluir items reales (que comiencen con A- o B-) y que estén seleccionados
+          if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+            items.push({
+              id: item.id,
+              concept: item.concept,
+              section: getSectionName(sectionId),
+              sectionId: sectionId,
+              accountId: accountId // Asociar con la cuenta actual
+            });
+          }
+        });
+      });
+      
+      // Actualizar el estado con los ítems filtrados
+      setProjectItems(items);
+      
     } catch (error) {
       console.error('Error loading project items:', error);
+      setProjectItems([]);
     }
   };
 
@@ -398,17 +413,15 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
-    
     setIsLoading(true);
     
     // Simular carga de datos
     setTimeout(() => {
-      // Guardar la cuenta seleccionada en localStorage después de cargar
+      // Guardar la cuenta seleccionada en localStorage
       storage.setItem('selectedWorkHubAccount', { id: accountId, name: accountName });
       
-      // Recargar los datos del proyecto para esta cuenta específica
+      // Recargar los datos del proyecto para esta cuenta
       loadProjectItems();
-      
       setIsLoading(false);
     }, 1500);
   };
@@ -857,11 +870,17 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                           <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block', padding: '2rem' }}>
-                            <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                            <h3>{selectedAccount ? 'No hay ítems para esta cuenta' : 'Selecciona una cuenta para ver los proyectos'}</h3>
-                            <p>{selectedAccount 
-                              ? 'Esta cuenta no tiene ítems configurados en el acuerdo de colaboración' 
-                              : 'Haz clic en "Seleccionar cuenta" en la parte superior derecha para comenzar'}</p>
+                            <Briefcase size={48} style={{ marginBottom: '1.5rem', opacity: 0.7 }} />
+                            <h3 style={{ marginBottom: '1rem' }}>
+                              {selectedAccount 
+                                ? 'No hay ítems para esta cuenta' 
+                                : 'Selecciona una cuenta para ver los proyectos'}
+                            </h3>
+                            <p style={{ maxWidth: '300px', margin: '0 auto' }}>
+                              {selectedAccount 
+                                ? 'Esta cuenta no tiene ítems configurados en el acuerdo de colaboración. Por favor configura los ítems desde la sección EHO.' 
+                                : 'Haz clic en "Seleccionar cuenta" en la parte superior derecha para comenzar a trabajar con un proyecto.'}
+                            </p>
                           </div> 
                         </td>
                       </tr>

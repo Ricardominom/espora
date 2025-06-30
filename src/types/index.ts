@@ -94,6 +94,7 @@ export interface ChecklistItem {
   section: string;
   sectionId: string;
   completed: boolean;
+  accountId?: number;
   fieldValues: Record<string, string>;
 }
 
