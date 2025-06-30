@@ -1174,6 +1174,7 @@
   justify-content: center;
   width: 100%;
   vertical-align: middle;
+}
 
 .empty-project-content {
   display: flex;
