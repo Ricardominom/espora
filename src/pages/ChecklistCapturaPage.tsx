@@ -24,7 +24,6 @@ interface TaskAssignment {
   itemId: string;
   userId: string;
   concept: string;
-  clientName: string;
   dueDate: string;
   section: string;
   sectionId: string;
@@ -261,7 +260,6 @@ const ChecklistCapturaPage: React.FC = () => {
             itemId,
             userId: assignedUserId,
             concept: item.concept,
-            clientName: clientName, // Añadir el nombre del cliente a la asignación
             section: item.section,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',
@@ -430,7 +428,6 @@ const ChecklistCapturaPage: React.FC = () => {
             itemId, 
             userId, 
             concept: item.concept, 
-            clientName: clientName, // Añadir el nombre del cliente a la asignación
             section: item.section,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',
