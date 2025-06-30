@@ -77,6 +77,7 @@ const WorkHubPage: React.FC = () => {
   useEffect(() => {
     setIsVisible(true);
 
+    console.log("WorkHubPage mounted");
     // Función para cargar las tareas
     const loadTasks = () => {
       try {
@@ -84,6 +85,12 @@ const WorkHubPage: React.FC = () => {
         let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
         
         // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-) 
+        savedAssignments = savedAssignments.filter(task => 
+          task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
+        );
+        
+        console.log("All task assignments:", savedAssignments.length);
+        
         // Para tareas, mostrar todas las tareas de todas las cuentas
         savedAssignments = savedAssignments.filter(task => 
           task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
@@ -92,6 +99,7 @@ const WorkHubPage: React.FC = () => {
         // Filtrar solo las tareas asignadas al usuario actual
         if (user) {
           const userTasks = savedAssignments.filter(task => task.userId === user.id);
+          console.log("User tasks:", userTasks.length);
           setTaskAssignments(userTasks);
         }
       } catch (error) {
@@ -101,7 +109,6 @@ const WorkHubPage: React.FC = () => {
     
     // Cargar tareas inicialmente
     loadTasks();
-    loadProjectItems();
   }, [user]);
 
   // Combine project items and task assignments for the project tab
@@ -230,6 +237,20 @@ const WorkHubPage: React.FC = () => {
     };
     
     return sectionMapping[sectionId] || sectionId;
+  };
+  
+  // Función para obtener el nombre de la sección a partir del sectionId
+  const getSectionNameFromId = (sectionId: string): string => {
+    const sectionMapping = {
+      'estrategia': 'Set Up Estrategia Digital',
+      'antropologicos': 'Estudios Antropológicos', 
+      'otros-estudios': 'Otros Estudios',
+      'acompanamiento': 'Set Up Acompañamiento Digital',
+      'gerencia': 'Set Up Gerencia Digital',
+      'produccion': 'Set Up Producción',
+      'difusion': 'Set up Difusión'
+    };
+    return sectionMapping[sectionId as keyof typeof sectionMapping] || sectionId;
   };
 
   // Función para obtener las tareas según la categoría seleccionada
@@ -397,22 +418,6 @@ const WorkHubPage: React.FC = () => {
     return fieldValues[fieldKey] || '';
   };
   
-  {/* Mapeo de secciones con sus títulos correctos */}
-  const sectionMapping = {
-    'estrategia': 'Set Up Estrategia Digital',
-    'antropologicos': 'Estudios Antropológicos', 
-    'otros-estudios': 'Otros Estudios',
-    'acompanamiento': 'Set Up Acompañamiento Digital',
-    'gerencia': 'Set Up Gerencia Digital',
-    'produccion': 'Set Up Producción',
-    'difusion': 'Set up Difusión'
-  };
-  
-  // Función para obtener el nombre de la sección a partir del sectionId
-  const getSectionNameFromId = (sectionId: string): string => {
-    return sectionMapping[sectionId as keyof typeof sectionMapping] || sectionId;
-  };
-
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
@@ -425,6 +430,17 @@ const WorkHubPage: React.FC = () => {
       loadProjectItems(); // Load project items for the selected account
       setIsLoading(false);
     }, 500);
+  };
+  
+  {/* Mapeo de secciones con sus títulos correctos */}
+  const sectionMapping = {
+    'estrategia': 'Set Up Estrategia Digital',
+    'antropologicos': 'Estudios Antropológicos', 
+    'otros-estudios': 'Otros Estudios',
+    'acompanamiento': 'Set Up Acompañamiento Digital',
+    'gerencia': 'Set Up Gerencia Digital',
+    'produccion': 'Set Up Producción',
+    'difusion': 'Set up Difusión'
   };
 
   return (
