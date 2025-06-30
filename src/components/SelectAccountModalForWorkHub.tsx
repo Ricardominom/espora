@@ -103,6 +103,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
                 </option>
               ))}
             </select>
+          </div>
 
           <div className="modal-footer">
             <button type="button" onClick={onClose} className="cancel-button">
