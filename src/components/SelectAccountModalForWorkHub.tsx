@@ -26,7 +26,7 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>(currentAccountId?.toString() || "");
 
-  // Reset selected account when modal opens or currentAccountId changes
+  // Reset selected account when modal opens
   useEffect(() => {
     if (isOpen) {
       // Fetch active accounts
@@ -43,6 +43,9 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
       
       // Reset selected account ID
       setSelectedAccountId(currentAccountId ? currentAccountId.toString() : "");
+      
+      // Clear any previous data
+      localStorage.removeItem('filteredProjectItems');
     }
   }, [isOpen, currentAccountId]);
 
@@ -57,6 +60,9 @@ const SelectAccountModalForWorkHub: React.FC<SelectAccountModalForWorkHubProps> 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedAccountId) {
+      // Clear any previous data before selecting a new account
+      localStorage.removeItem('filteredProjectItems');
+      
       const accountId = parseInt(selectedAccountId);
       const account = accounts.find(acc => acc.id === accountId);
       if (account) {

@@ -153,7 +153,9 @@ const WorkHubPage: React.FC = () => {
   // Group filtered items by section
   useEffect(() => {
     if (!filteredProjectItems.length) {
-      setGroupedItems({});
+      // Set empty grouped items
+      const emptyGrouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
+      setGroupedItems(emptyGrouped);
       return;
     }
 
@@ -888,13 +890,25 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                           {isLoading ? (
-                            <div className="project-loading-state">
+                            <div className="project-loading-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                               <div className="loading-spinner"></div>
                               <p>Cargando datos de la cuenta...</p>
                             </div>
                           ) : (
                             <div className="empty-project-content">
-                              
+                              {!selectedAccount ? (
+                                <>
+                                  <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                                  <h3>Selecciona una cuenta</h3>
+                                  <p>Haz clic en "Seleccionar cuenta" para ver los proyectos</p>
+                                </>
+                              ) : filteredProjectItems.length === 0 ? (
+                                <>
+                                  <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                                  <h3>No hay proyectos</h3>
+                                  <p>No se encontraron proyectos para esta cuenta</p>
+                                </>
+                              ) : null}
                             </div>
                           )}
                         </td>
