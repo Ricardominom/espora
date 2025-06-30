@@ -447,9 +447,8 @@ const WorkHubPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th>Código</th>
-                    <th>Sección</th>
-                    <th>Estado</th>
+                    <th>Updates</th>
+                    <th>Subele...</th>
                     <th>Fase</th>
                     <th>Línea estratégica</th>
                     <th>Microcampaña</th>
@@ -480,25 +479,17 @@ const WorkHubPage: React.FC = () => {
                     combinedItems.map((item) => (
                       <tr key={item.id} className={item.completed ? "completed-item" : ""}>
                         <td className="item-code-cell">
-                          {item.id} - {item.concept}
+                          {item.concept}
                         </td>
-                        <td className="item-code-cell">
-                          {item.id}
+                        <td>
+                          <button className="project-action-btn update-btn">
+                            <FileText size={16} />
+                          </button>
                         </td>
-                        <td className="item-section-cell">
-                          {item.section}
-                        </td>
-                        <td className="item-status-cell">
-                          {item.completed ? (
-                            <div className="status-completed">
-                              <CheckCheck size={14} />
-                              <span>Completado</span>
-                            </div>
-                          ) : (
-                            <div className="status-pending">
-                              <span>Pendiente</span>
-                            </div>
-                          )}
+                        <td>
+                          <button className="project-action-btn upload-btn">
+                            <ArrowUp size={16} />
+                          </button>
                         </td>
                         <td>
                           <input 
@@ -744,7 +735,7 @@ const WorkHubPage: React.FC = () => {
                     ))
                   ) : (
                     <tr style={{ height: '300px' }}>
-                      <td colSpan={27} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                      <td colSpan={25} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                         <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
                           <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                           <h3>No hay ítems de proyecto</h3>
