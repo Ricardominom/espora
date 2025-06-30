@@ -359,13 +359,6 @@ const ChecklistCapturaPage: React.FC = () => {
     delete completedItems[itemToDelete];
     storage.setItem('completedItems', completedItems);
     
-    // También eliminar el item de las asignaciones de tareas
-    const updatedAssignments = taskAssignments.filter(assignment => assignment.itemId !== itemToDelete);
-    if (updatedAssignments.length !== taskAssignments.length) {
-      setTaskAssignments(updatedAssignments);
-      storage.setItem('taskAssignments', updatedAssignments);
-    }
-    
     // Actualizar el conteo de progreso
     const updatedItems = checklistItems.filter(item => item.id !== itemToDelete);
     const completedCount = updatedItems.filter(item => item.completed).length;
