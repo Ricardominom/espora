@@ -913,11 +913,7 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message">
                           {!selectedAccount ? (
-                            <div className="empty-project-content">
-                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
-                              <h3>Selecciona una cuenta</h3>
-                              <p>Haz clic en "Seleccionar cuenta" para ver los proyectos</p>
-                            </div>
+                            null
                           ) : null}
                         </td>
                       </tr>
