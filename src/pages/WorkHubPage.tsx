@@ -415,7 +415,7 @@ const WorkHubPage: React.FC = () => {
         </h1>
         
         <div className="header-right">
-          <button 
+          {activeTab === 'proyecto' && <button 
             className="account-select-button"
             onClick={() => setShowAccountModal(true)}
             style={{
@@ -438,10 +438,10 @@ const WorkHubPage: React.FC = () => {
                 color: '#0171E2'
               })
             }}
-          >
+          > 
             <Users size={16} />
             <span>Seleccionar cuenta</span>
-          </button>
+          </button>}
         </div>
       </div>
 
