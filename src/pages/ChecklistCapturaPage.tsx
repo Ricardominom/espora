@@ -164,6 +164,9 @@ const ChecklistCapturaPage: React.FC = () => {
   // Función para generar los items del checklist
   const generateChecklistItems = (selectedItems: {[key: string]: boolean}, allData: {[key: string]: any[]}) => {
     const items: ChecklistItem[] = [];
+    
+    // Ensure we have the client name
+    const clientNameToUse = clientName || storage.getItem<string>('clientName') || 'Cliente';
 
     // Process each section type
     Object.entries(allData).forEach(([sectionId, data]: [string, any[]]) => {
@@ -416,6 +419,7 @@ const ChecklistCapturaPage: React.FC = () => {
             ...updatedAssignments[existingAssignmentIndex],
             userId: userId,
            concept: item.concept,
+          clientName: clientNameToUse, // Add client name to the assignment
            section: item.section,
            sectionId: item.sectionId,
             clientName: clientName, // Agregar referencia al cliente
@@ -429,6 +433,7 @@ const ChecklistCapturaPage: React.FC = () => {
             itemId, 
             userId, 
             concept: item.concept, 
+            clientName: clientNameToUse, // Add client name to the assignment
             section: item.section,
             sectionId: item.sectionId,
             dueDate: dueDates[itemId] || '',

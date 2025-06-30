@@ -28,6 +28,7 @@ interface ProjectItem {
   section: string;
   sectionId: string;
   completed?: boolean;
+  clientName?: string;
 }
 
 const WorkHubPage: React.FC = () => {
@@ -90,51 +91,38 @@ const WorkHubPage: React.FC = () => {
   // Effect to filter project items based on selected account
   useEffect(() => {
     if (!selectedAccount) {
-      setFilteredProjectItems([]);
+      setFilteredProjectItems([]); 
       return;
     }
 
     // Get client name from selected account
     const clientName = selectedAccount.name.split(' - ')[0];
-    
-    // Filter task assignments based on the selected client
-    const filteredTasks = taskAssignments.filter(task => 
-      task.clientName === clientName
-    );
-    setTaskAssignments(filteredTasks);
-
-    // Load client-specific data from localStorage
-    const clientData = storage.getItem<{
-      selectedItems: {[key: string]: boolean},
-      formData: {[key: string]: any[]},
-      completedItems: {[key: string]: boolean}
-    }>(`client_${clientName}_data`);
-
-    if (clientData) {
-      // Use client-specific data if available
-      const items: ProjectItem[] = [];
+    try {
+      // Get all task assignments
+      const allAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
       
-      if (clientData.formData) {
-        Object.entries(clientData.formData).forEach(([sectionId, data]: [string, any[]]) => {
-          data.forEach((item) => {
-            if (clientData.selectedItems && clientData.selectedItems[item.id]) {
-              items.push({
-                id: item.id,
-                concept: item.concept,
-                section: getSectionName(sectionId),
-                sectionId: sectionId,
-                completed: clientData.completedItems ? clientData.completedItems[item.id] : false
-              });
-            }
-          });
-        });
-      }
+      // Filter tasks for this client and user
+      const clientTasks = allAssignments.filter(task => 
+        task.clientName === clientName && 
+        task.userId === user?.id
+      );
       
-      setFilteredProjectItems(items);
-    } else {
-      // Filter project items based on the selected account
-      // This is a fallback if client-specific data isn't available
-      // In a real app, you would fetch data for the specific account from the server
+      // Set filtered tasks
+      setTaskAssignments(clientTasks);
+      
+      // Convert task assignments to project items
+      const projectItems: ProjectItem[] = clientTasks.map(task => ({
+        id: task.itemId,
+        concept: task.concept,
+        section: task.section,
+        sectionId: task.sectionId || '',
+        completed: task.completed || false,
+        clientName: task.clientName
+      }));
+      
+      setFilteredProjectItems(projectItems);
+    } catch (error) {
+      console.error('Error filtering project items:', error);
       setFilteredProjectItems([]);
     }
   }, [selectedAccount]);
@@ -142,7 +130,7 @@ const WorkHubPage: React.FC = () => {
   // Combine filtered project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of filtered project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...filteredProjectItems];
+    const combined: (ProjectItem | TaskAssignment)[] = filteredProjectItems;
 
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
@@ -176,7 +164,7 @@ const WorkHubPage: React.FC = () => {
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
-      // Ahora solo cargamos las tareas asignadas al usuario actual
+      // Cargar todas las tareas asignadas al usuario actual
       // Los datos específicos del proyecto se cargarán cuando se seleccione una cuenta
       const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
       const userAssignments = savedAssignments.filter(task => task.userId === user?.id);
@@ -204,7 +192,7 @@ const WorkHubPage: React.FC = () => {
   // Función para obtener las tareas según la categoría seleccionada
   const getFilteredTasks = () => {
     if (!taskAssignments.length) return [];
-    
+
     // Filtrar solo tareas reales y que pertenezcan al usuario actual
     const userTasks = taskAssignments.filter(task => 
       task.itemId && 
@@ -213,7 +201,7 @@ const WorkHubPage: React.FC = () => {
     );
     
     if (!userTasks.length) return [];
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -233,7 +221,7 @@ const WorkHubPage: React.FC = () => {
       if (!task.dueDate) return selectedCategory === 'no-date'; 
       
       // Create date without timezone adjustments by using the date parts directly
-      const dateParts = task.dueDate.split('-').map(part => parseInt(part, 10));
+      const dateParts = task.dueDate.split('-').map(part => parseInt(part));
       const dueDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
       dueDate.setHours(0, 0, 0, 0);
       
@@ -292,7 +280,7 @@ const WorkHubPage: React.FC = () => {
       if (!task.dueDate || !task.itemId || !(task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) return false;
       
       // Create date without timezone adjustments by using the date parts directly
-      const dateParts = task.dueDate.split('-').map(part => parseInt(part, 10));
+      const dateParts = task.dueDate.split('-').map(part => parseInt(part));
       const dueDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
       dueDate.setHours(0, 0, 0, 0);
       
@@ -882,8 +870,18 @@ const WorkHubPage: React.FC = () => {
                       <tr style={{ height: '300px' }}>
                         <td colSpan={26} className="empty-project-message">
                           {!selectedAccount ? (
-                            null
-                          ) : <div className="empty-project-content"><p>No hay datos para esta cuenta</p></div>}
+                            <div className="empty-project-content">
+                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                              <h3>Selecciona una cuenta</h3>
+                              <p>Haz clic en "Seleccionar cuenta" para ver los proyectos</p>
+                            </div>
+                          ) : filteredProjectItems.length === 0 ? (
+                            <div className="empty-project-content">
+                              <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+                              <h3>No hay datos para esta cuenta</h3>
+                              <p>No se encontraron items para {selectedAccount.name}</p>
+                            </div>
+                          ) : null}
                         </td>
                       </tr>
                     )}
