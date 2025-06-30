@@ -43,6 +43,9 @@
   z-index: 20;
   width: 100%;
   padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -77,6 +80,10 @@
   text-shadow: 
     0 2px 4px rgba(1, 113, 226, 0.1),
     0 4px 8px rgba(1, 113, 226, 0.05);
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   filter: drop-shadow(0 2px 4px rgba(1, 113, 226, 0.1));
 }
 
@@ -101,10 +108,52 @@
   position: absolute;
   right: 2rem;
   top: 50%;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  transform: translateY(-50%);
+}
+
+/* Account select button */
+.account-select-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dark theme account select button */
+.workhub-page.dark-theme .account-select-button {
+  background: rgba(147, 112, 219, 0.15);
+  border: 1px solid rgba(147, 112, 219, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.workhub-page.dark-theme .account-select-button:hover {
+  background: rgba(147, 112, 219, 0.25);
+  border-color: rgba(147, 112, 219, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(147, 112, 219, 0.2);
+}
+
+/* Light theme account select button */
+.workhub-page.light-theme .account-select-button {
+  background: rgba(1, 113, 226, 0.1);
+  border: 1px solid rgba(1, 113, 226, 0.3);
+  color: #0171E2;
+}
+
+.workhub-page.light-theme .account-select-button:hover {
+  background: rgba(1, 113, 226, 0.2);
+  border-color: rgba(1, 113, 226, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(1, 113, 226, 0.15);
 }
 
 /* Breadcrumb Container */
@@ -1526,5 +1575,15 @@
   
   .workhub-content {
     padding: 0 1rem 1rem 1rem;
+  }
+  
+  .account-select-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+  
+  .workhub-title {
+    max-width: 60%;
+    font-size: 1.75rem;
   }
 }
