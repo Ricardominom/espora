@@ -419,10 +419,10 @@ const WorkHubPage: React.FC = () => {
               <table className="project-table">
                 <thead>
                   <tr>
+                    <th>Item</th>
                     <th>Updates</th>
                     <th>Subele...</th>
                     <th>Código</th>
-                    <th>Item</th>
                     <th>Sección</th>
                     <th>Fase</th>
                     <th>Línea estratégica</th>
