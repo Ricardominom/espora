@@ -726,6 +726,7 @@ const WorkHubPage: React.FC = () => {
                 </table>
               </div>
             )}
+            </div>
           </div>
         )}
       </div>
