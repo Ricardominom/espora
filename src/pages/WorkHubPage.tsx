@@ -13,8 +13,6 @@ import '../styles/workhub.css';
 interface TaskAssignment {
   itemId: string;
   userId: string;
-  clientId?: string;
-  clientName?: string;
   concept: string;
   dueDate: string;
   section: string;
@@ -41,7 +39,7 @@ const WorkHubPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<{id: number, name: string} | null>(() => {
     // Intentar cargar la cuenta seleccionada desde localStorage
     const savedAccount = storage.getItem<{id: number, name: string}>('selectedWorkHubAccount');
-    return savedAccount || null;
+    return savedAccount;
   });
   const [isLoading, setIsLoading] = useState(false);
   const [projectItems, setProjectItems] = useState<ProjectItem[]>([]);
@@ -87,7 +85,7 @@ const WorkHubPage: React.FC = () => {
     // Función para cargar las tareas
     const loadTasks = () => {
       try {
-        // Cargar las asignaciones de tareas desde localStorage
+        // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
         let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
         
         // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
@@ -97,16 +95,7 @@ const WorkHubPage: React.FC = () => {
         
         // Filtrar solo las tareas asignadas al usuario actual
         if (user) {
-          let userTasks = savedAssignments.filter(task => task.userId === user.id);
-          
-          // Si hay una cuenta seleccionada, filtrar por cliente también
-          if (selectedAccount) {
-            const clientId = selectedAccount.name.split(' - ')[0];
-            userTasks = userTasks.filter(task => 
-              !task.clientId || task.clientId === clientId
-            );
-          }
-          
+          const userTasks = savedAssignments.filter(task => task.userId === user.id);
           setTaskAssignments(userTasks);
         }
       } catch (error) {
@@ -117,7 +106,7 @@ const WorkHubPage: React.FC = () => {
     // Cargar tareas inicialmente
     loadTasks();
     loadProjectItems();
-  }, [user, selectedAccount]);
+  }, [user]);
 
   // Effect to filter project items based on selected account
   useEffect(() => {
@@ -128,7 +117,7 @@ const WorkHubPage: React.FC = () => {
 
     setIsLoading(true);
 
-    // Load data for the selected account
+    // Simulate loading data for the selected account
     setTimeout(() => {
       // Filter project items based on account ID
       let filtered: ProjectItem[] = [];
@@ -136,16 +125,16 @@ const WorkHubPage: React.FC = () => {
       // This is a simple filter for demonstration
       // In a real app, you would fetch data from the server for this specific account
       switch (selectedAccount.id) {
-        case 1: // Juan Pérez - Alcalde
+        case 1: // Juan Pérez
           filtered = projectItems.filter(item => 
             item.id.startsWith('A-1') || item.id.startsWith('A-101'));
           break;
-        case 2: // María García - Gobernadora
+        case 2: // María García
           filtered = projectItems.filter(item => 
             item.id.startsWith('A-2') || item.id.startsWith('A-102'));
           break;
-        case 4: // Ana Martínez - Senadora
-          filtered = projectItems.filter(item =>  
+        case 4: // Ana Martínez
+          filtered = projectItems.filter(item => 
             item.id.startsWith('A-4') || item.id.startsWith('A-104'));
           break;
         case 6: // Laura Hernández
@@ -157,9 +146,6 @@ const WorkHubPage: React.FC = () => {
       }
       
       setFilteredProjectItems(filtered);
-      
-      // Also reload tasks for this account
-      loadTasks();
       setIsLoading(false);
     }, 800); // Simulate network delay
   }, [selectedAccount, projectItems]); 
@@ -203,18 +189,6 @@ const WorkHubPage: React.FC = () => {
     setSectionOrder(order);
   }, [filteredProjectItems]);
 
-  // Function to load tasks specific to the selected account
-  const loadTasks = () => {
-    if (user && selectedAccount) {
-      const clientId = selectedAccount.name.split(' - ')[0];
-      const savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
-      const userTasks = savedAssignments.filter(task => 
-        task.userId === user.id && (!task.clientId || task.clientId === clientId)
-      );
-      setTaskAssignments(userTasks);
-    }
-  };
-
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
@@ -222,16 +196,15 @@ const WorkHubPage: React.FC = () => {
       let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
       const formData = storage.getItem<{[key: string]: any[]}>('formData');
       
-      const loadedItems: ProjectItem[] = [];
-      
       if (formData && Object.keys(formData).length > 0) {
+        const items: ProjectItem[] = [];
         
         // Procesar cada sección
         Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
           data.forEach((item) => {
             // Solo incluir items reales (que comiencen con A- o B-)
             if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-              loadedItems.push({
+              items.push({
                 id: item.id,
                 concept: item.concept,
                 section: getSectionName(sectionId),
@@ -241,9 +214,9 @@ const WorkHubPage: React.FC = () => {
             }
           });
         });
+        
+        setProjectItems(items);
       }
-      
-      setProjectItems(loadedItems);
       
       // Load completed items status
       const completedItems = storage.getItem<{[key: string]: boolean}>('completedItems') || {};
@@ -272,22 +245,13 @@ const WorkHubPage: React.FC = () => {
   };
 
   // Función para obtener las tareas según la categoría seleccionada
-  // Función para obtener las tareas según la categoría seleccionada
   const getFilteredTasks = () => {
     if (!taskAssignments.length) return [];
     
     // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-    let realTasks = taskAssignments.filter(task => 
+    const realTasks = taskAssignments.filter(task => 
       task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
-    
-    // Filter by selected account if one is selected
-    if (selectedAccount) {
-      const clientId = selectedAccount.name.split(' - ')[0];
-      realTasks = realTasks.filter(task => 
-        !task.clientId || task.clientId === clientId
-      );
-    }
     
     if (!realTasks.length) return [];
     
@@ -340,17 +304,9 @@ const WorkHubPage: React.FC = () => {
     if (!taskAssignments.length) return 0;
     
     // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
-    let realTasks = taskAssignments.filter(task => 
+    const realTasks = taskAssignments.filter(task => 
       task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
     );
-    
-    // Filter by selected account if one is selected
-    if (selectedAccount) {
-      const clientId = selectedAccount.name.split(' - ')[0];
-      realTasks = realTasks.filter(task => 
-        !task.clientId || task.clientId === clientId
-      );
-    }
     
     if (!realTasks.length) return 0;
 
@@ -474,7 +430,6 @@ const WorkHubPage: React.FC = () => {
     setSelectedAccount({ id: accountId, name: accountName });
     
     // Reset field values when changing accounts
-    // This ensures we don't show values from previous accounts
     setFieldValues({});
     
     // Guardar la cuenta seleccionada en localStorage
@@ -483,9 +438,6 @@ const WorkHubPage: React.FC = () => {
     // Reset filtered items and grouped items
     setFilteredProjectItems([]);
     setGroupedItems({});
-
-    // Reset task assignments for this account
-    loadTasks();
     
     setIsLoading(true);
     
@@ -642,7 +594,6 @@ const WorkHubPage: React.FC = () => {
                     <tr>
                       <th>Item</th>
                       <th>Subele...</th>
-                      <th>Subele...</th>
                       <th>Fase</th>
                       <th>Línea estratégica</th>
                       <th>Microcampaña</th>
@@ -695,9 +646,6 @@ const WorkHubPage: React.FC = () => {
                                       <span className="status-pending"><Clock4 size={14} /> Pendiente</span>
                                     )}
                                   </div>
-                                  <button className="project-action-btn update-btn">
-                                    <FileText size={16} />
-                                  </button>
                                 </td>
                                 <td>
                                   <button className="project-action-btn upload-btn">

@@ -24,8 +24,6 @@ interface ChecklistItem {
 interface TaskAssignment {
   itemId: string;
   userId: string;
-  clientId?: string;
-  clientName?: string;
   concept: string;
   dueDate: string;
   section: string;
@@ -39,7 +37,7 @@ const ChecklistCapturaPage: React.FC = () => {
   const [clientName, setClientName] = useState('');
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [users, setUsers] = useState<Omit<User, 'password'>[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showAccessDeniedModal, setShowAccessDeniedModal] = useState(false);
@@ -161,9 +159,8 @@ const ChecklistCapturaPage: React.FC = () => {
         // Reset localStorage for this specific component
         storage.removeItem('fieldValues');
         storage.removeItem('dueDates');
+        storage.removeItem('taskAssignments');
         storage.removeItem('completedItems');
-        
-        // Don't remove all task assignments, just filter them later
       }
       
       setClientName(state.clientName);
@@ -288,8 +285,6 @@ const ChecklistCapturaPage: React.FC = () => {
           const newAssignment: TaskAssignment = {
             itemId,
             userId: assignedUserId,
-            clientId: clientName.split(' - ')[0], // Store client ID (name)
-            clientName: clientName, // Store full client name
             concept: item.concept,
             section: item.section,
             sectionId: item.sectionId,
@@ -443,18 +438,12 @@ const ChecklistCapturaPage: React.FC = () => {
         if (existingAssignmentIndex >= 0) {
           // Actualizar la asignación existente
           const updatedAssignments = [...taskAssignments];
-          // Preserve client info if it exists, otherwise add it
-          const existingClientId = updatedAssignments[existingAssignmentIndex].clientId;
-          const existingClientName = updatedAssignments[existingAssignmentIndex].clientName;
-          
           updatedAssignments[existingAssignmentIndex] = {
             ...updatedAssignments[existingAssignmentIndex],
             userId: userId,
-            clientId: existingClientId || clientName.split(' - ')[0],
-            clientName: existingClientName || clientName,
-            concept: item.concept,
-            section: item.section,
-            sectionId: item.sectionId,
+           concept: item.concept,
+           section: item.section,
+           sectionId: item.sectionId,
             completed: item.completed
           };
           setTaskAssignments(updatedAssignments);
@@ -464,8 +453,6 @@ const ChecklistCapturaPage: React.FC = () => {
           const newAssignment = {
             itemId, 
             userId, 
-            clientId: clientName.split(' - ')[0],
-            clientName: clientName,
             concept: item.concept, 
             section: item.section,
             sectionId: item.sectionId,
