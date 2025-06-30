@@ -419,11 +419,9 @@ const WorkHubPage: React.FC = () => {
               <table className="project-table">
                 <thead>
                   <tr>
-                    <th>Item</th>
                     <th>Updates</th>
                     <th>Subele...</th>
-                    <th>Código</th>
-                    <th>Sección</th>
+                    <th>Item</th>
                     <th>Fase</th>
                     <th>Línea estratégica</th>
                     <th>Microcampaña</th>
@@ -455,22 +453,16 @@ const WorkHubPage: React.FC = () => {
                       <tr key={item.id}>
                         <td>
                           <button className="project-action-btn update-btn">
-                            <FileText size={14} />
+                            <FileText size={16} />
                           </button>
                         </td>
                         <td>
                           <button className="project-action-btn upload-btn">
-                            <ArrowUp size={14} />
+                            <ArrowUp size={16} />
                           </button>
-                        </td>
-                        <td className="item-code-cell">
-                          {item.id}
                         </td>
                         <td className="item-concept-cell">
                           {`${item.id} - ${item.concept}`}
-                        </td>
-                        <td className="item-section-cell">
-                          {item.section}
                         </td>
                         <td>
                           <input 
@@ -716,7 +708,7 @@ const WorkHubPage: React.FC = () => {
                     ))
                   ) : (
                     <tr style={{ height: '300px' }}>
-                      <td colSpan={28} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
+                      <td colSpan={25} className="empty-project-message" style={{ display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', height: '300px' }}>
                         <div className="empty-project-content" style={{ margin: '0 auto', display: 'inline-block' }}>
                           <Briefcase size={48} style={{ marginBottom: '1rem' }} />
                           <h3>No hay ítems de proyecto</h3>
