@@ -49,9 +49,31 @@ export const storage = {
   // Guardar datos del acuerdo de colaboración
   saveAgreementData: (clientName: string, selectedItems: {[key: string]: boolean}, formData: any) => {
     try {
+      // Guardar en el formato antiguo para compatibilidad
       storage.setItem('selectedItems', selectedItems);
       storage.setItem('formData', formData); 
       storage.setItem('clientName', clientName);
+      
+      // Guardar en el nuevo formato estructurado por cliente
+      const agreementData = {
+        clientName,
+        selectedItems,
+        formData
+      };
+      storage.setItem('agreementData', agreementData);
+      
+      // Actualizar el almacenamiento de todos los acuerdos
+      const allAgreementData = storage.getItem<{[clientName: string]: {
+        selectedItems: {[key: string]: boolean},
+        formData: {[key: string]: any[]}
+      }}>('allAgreementData') || {};
+      
+      allAgreementData[clientName] = {
+        selectedItems,
+        formData
+      };
+      
+      storage.setItem('allAgreementData', allAgreementData);
     } catch (error) {
       console.error('Error saving agreement data:', error);
     }
@@ -78,9 +100,13 @@ export const storage = {
   // Limpiar datos del acuerdo de colaboración
   clearAgreementData: () => {
     try {
+      // Limpiar formato antiguo
       storage.removeItem('selectedItems');
       storage.removeItem('formData');
       storage.removeItem('clientName');
+      
+      // Limpiar nuevo formato
+      storage.removeItem('agreementData');
     } catch (error) {
       console.error('Error clearing agreement data:', error);
     }
