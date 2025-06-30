@@ -83,8 +83,7 @@ const WorkHubPage: React.FC = () => {
         // Cargar las asignaciones de tareas desde localStorage pero filtrar las dummy
         let savedAssignments = storage.getItem<TaskAssignment[]>('taskAssignments') || [];
         
-        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-) 
-        // Para tareas, mostrar todas las tareas de todas las cuentas
+        // Filtrar solo tareas reales (que tengan un itemId que comience con A- o B-)
         savedAssignments = savedAssignments.filter(task => 
           task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))
         );
@@ -107,29 +106,25 @@ const WorkHubPage: React.FC = () => {
   // Combine project items and task assignments for the project tab
   useEffect(() => {
     // Create a combined list of project items and task assignments
-    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems];
+    const combined: (ProjectItem | TaskAssignment)[] = [...projectItems]; 
     
-    // Only add task assignments to project items if we're in the tareas tab
-    // For proyecto tab, we only show items from the selected account
-    if (activeTab === 'tareas') {
-      // Add task assignments that aren't already in project items
-      taskAssignments.forEach(task => {
-        // Check if this task is already in project items
-        const existingItem = projectItems.find(item => item.id === task.itemId);
-        
-        // If not found and it's a valid task with an itemId, add it
-        if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
-          combined.push({
-            id: task.itemId,
-            concept: task.concept || "Tarea sin nombre",
-            section: task.section || "Sin sección",
-            sectionId: task.sectionId || "",
-            completed: task.completed || false,
-            isTaskAssignment: true
-          });
-        }
-      });
-    }
+    // Add task assignments that aren't already in project items
+    taskAssignments.forEach(task => {
+      // Check if this task is already in project items
+      const existingItem = projectItems.find(item => item.id === task.itemId);
+      
+      // If not found and it's a valid task with an itemId, add it
+      if (!existingItem && task.itemId && (task.itemId.startsWith('A-') || task.itemId.startsWith('B-'))) {
+        combined.push({
+          id: task.itemId,
+          concept: task.concept || "Tarea sin nombre",
+          section: task.section || "Sin sección",
+          sectionId: task.sectionId || "",
+          completed: task.completed || false,
+          isTaskAssignment: true
+        });
+      }
+    });
     
     // Group items by section
     const grouped: {[key: string]: (ProjectItem | TaskAssignment)[]} = {};
@@ -158,53 +153,35 @@ const WorkHubPage: React.FC = () => {
     
     setGroupedItems(grouped);
     setSectionOrder(order);
-  }, [projectItems, taskAssignments, activeTab]);
-  
-  // Effect to handle tab changes
-  useEffect(() => {
-    if (activeTab === 'proyecto' && !selectedAccount) {
-      // If switching to project tab without an account selected, show the modal
-      setShowAccountModal(true);
-    }
-  }, [activeTab, selectedAccount]);
+  }, [projectItems, taskAssignments]);
 
   // Función para cargar los ítems del proyecto desde localStorage
   const loadProjectItems = () => {
     try {
-      // Si no hay cuenta seleccionada, no cargar proyectos
-      if (!selectedAccount) {
-        setProjectItems([]);
-        return;
-      }
+      // Cargar los ítems seleccionados y los datos del formulario
+      let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
+      const formData = storage.getItem<{[key: string]: any[]}>('formData');
       
-      // Simular carga de proyectos específicos para la cuenta seleccionada
-      // En una aplicación real, aquí se cargarían los proyectos de la cuenta desde una API
-      setTimeout(() => {
-        // Cargar los ítems seleccionados y los datos del formulario
-        let selectedItems = storage.getItem<{[key: string]: boolean}>('selectedItems') || {};
-        const formData = storage.getItem<{[key: string]: any[]}>('formData');
+      if (formData) {
+        const items: ProjectItem[] = [];
         
-        if (formData) {
-          const items: ProjectItem[] = [];
-          
-          // Procesar cada sección
-          Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
-            data.forEach((item) => {
-              // Solo incluir items reales (que comiencen con A- o B-)
-              if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
-                items.push({
-                  id: item.id,
-                  concept: item.concept,
-                  section: getSectionName(sectionId),
-                  sectionId: sectionId
-                });
-              }
-            });
+        // Procesar cada sección
+        Object.entries(formData).forEach(([sectionId, data]: [string, any[]]) => {
+          data.forEach((item) => {
+            // Solo incluir items reales (que comiencen con A- o B-)
+            if (selectedItems[item.id] && (item.id.startsWith('A-') || item.id.startsWith('B-'))) {
+              items.push({
+                id: item.id,
+                concept: item.concept,
+                section: getSectionName(sectionId),
+                sectionId: sectionId
+              });
+            }
           });
-          
-          setProjectItems(items);
-        }
-      }, 100);
+        });
+        
+        setProjectItems(items);
+      }
     } catch (error) {
       console.error('Error loading project items:', error);
     }
@@ -409,13 +386,11 @@ const WorkHubPage: React.FC = () => {
   // Función para manejar la selección de cuenta
   const handleSelectAccount = (accountId: number, accountName: string) => {
     setSelectedAccount({ id: accountId, name: accountName });
-    setProjectItems([]); // Clear current items
     setIsLoading(true);
     
     // Simular carga de datos
     setTimeout(() => {
       // En una aplicación real, aquí cargaríamos los datos de la cuenta seleccionada
-      loadProjectItems(); // Load project items for the selected account
       setIsLoading(false);
     }, 1500);
   };
@@ -436,19 +411,37 @@ const WorkHubPage: React.FC = () => {
         </div>
         
         <h1 className="workhub-title">
-          WORKHUB {activeTab === 'proyecto' && selectedAccount && `- ${selectedAccount.name}`}
+          WORKHUB {selectedAccount && `- ${selectedAccount.name}`}
         </h1>
         
         <div className="header-right">
-          {activeTab === 'proyecto' && (
-            <button 
-              className="account-select-button"
-              onClick={() => setShowAccountModal(true)}
-            >
-              <Users size={16} />
-              <span>Seleccionar cuenta</span>
-            </button>
-          )}
+          <button 
+            className="account-select-button"
+            onClick={() => setShowAccountModal(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              backdropFilter: 'blur(10px)',
+              ...(isDarkMode ? {
+                background: 'rgba(147, 112, 219, 0.15)',
+                border: '1px solid rgba(147, 112, 219, 0.3)',
+                color: 'rgba(255, 255, 255, 0.9)'
+              } : {
+                background: 'rgba(1, 113, 226, 0.1)',
+                border: '1px solid rgba(1, 113, 226, 0.3)',
+                color: '#0171E2'
+              })
+            }}
+          >
+            <Users size={16} />
+            <span>Seleccionar cuenta</span>
+          </button>
         </div>
       </div>
 
